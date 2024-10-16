@@ -1,0 +1,82 @@
+body{
+    background-color: black;
+}
+
+.filters-gap{
+    display: flex;
+    gap: 1rem;
+}
+
+#buttons{
+    gap: 0.5rem;
+}
+
+.filter-box{
+    background-color: rgb(77, 76, 76);
+    border-radius: 25px;
+    padding: auto;
+    color: white;
+    text-align: left;
+    padding: 0.5rem;
+}
+
+.button-box{
+    display: flex;
+    gap: 0.25rem;
+    background-color: rgb(124, 124, 124);
+    border-radius: 25px;
+    padding: auto;
+    color: white;
+    text-align: left;
+    padding: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    transition: all 500ms;
+}
+
+.button-box:hover{
+    background-color: rgb(104, 104, 104);
+}
+.button-box:hover:active{
+    background-color: rgb(104, 104, 104);
+}
+
+.calendar-box{
+    border-radius: 5px;
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.button-std{
+    width: 8rem;
+    height: 2.5rem;
+}
+
+.box-std{
+    width: 10rem;
+    height: 2.5rem;
+}
+
+.box-med{
+    width: 16rem;
+    height: 2.5rem;
+}
+
+.t-accent{
+    color:orange;
+}
+
+.bg-accent{
+    background-color: orange;
+}
+
+.bg-accent:hover{
+    background-color: rgb(231, 139, 0);
+}
+.bg-accent:hover:active{
+    background-color: rgb(231, 139, 0);
+}
+
+.icon{
+    height: 100%;
+}
