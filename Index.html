@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesorías Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      body {
+            background-color: #1e1e1e;
+            color: #fff;
+        
+      }
+      .input-group{
+        width: auto;
+      }
+      .input-group-text-custom {
+      background-color: #333; /* Color de fondo oscuro */
+      color: #807834; /* Color del texto de 'Categorías:' */
+      border-radius: 20px 0 0 20px; /* Bordes redondeados */
+      border: none; /* Sin borde */
+      padding: 0.375rem 0.75rem; /* Ajuste del tamaño del texto */
+      }
+      .form-select-custom {
+      background-color: #333; /* Fondo oscuro */
+      color: #6c757d; /* Texto blanco */
+      border: none; /* Sin borde */
+      border-radius: 20px; /* Bordes redondeados */
+    }
+    .input-custom {
+      background-color: #333; /* Color de fondo oscuro */
+      color: white; /* Texto blanco */
+      border: none; /* Sin borde */
+      border-radius: 20px; /* Bordes redondeados */ /* Ajuste del tamaño del campo */
+    }
+    .btn-custom {
+      background-color: #6c757d; /* Color del botón */
+      border: none; /* Sin borde */
+      border-radius: 10px; /* Bordes redondeados */
+      padding: 0.375rem 0.75rem; /* Espaciado */
+      color: white;
+    }
+    .btn-custom2 {
+      background-color: #635e29; /* Color del botón */
+      border: none; /* Sin borde */
+      border-radius: 10px; /* Bordes redondeados */
+      padding: 0.375rem 0.75rem; /* Espaciado */
+      color: white;
+    }
+    .btn-custom i {
+      font-size: 1.2rem;
+    }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+      <div class="row">
+        <div class="d-flex">
+        <button class="btn btn-custom mx-2"> <!-- Añadí 'mx-2' para darle espacio horizontal -->
+          <i class="bi bi-file-minus-fill"></i> <!-- Ícono de calendario -->
+        </button>
+        <h4>Filtros</h4>
+        </div>
+      </div>
+      <hr>
+      <form class="row">
+        <div class="row">
+          <div class ="col-3">
+            <div class="input-group" style="max-width: 400px;">
+              <span class="input-group-text input-group-text-custom">Sede:</span>
+              <select class="form-select form-select-custom">
+                <option selected>Todas las sedes</option>
+                <option value="1">Categoría 1</option>
+                <option value="2">Categoría 2</option>
+                <option value="3">Categoría 3</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="row m-auto mt-3">
+              <div class="col-md-10">
+                <div class="d-flex align-items-center">
+                  <div class="input-group" style="max-width: 400px;">
+                    <span class="input-group-text input-group-text-custom">Inicio:</span>
+                    <input type="text" class="input-custom me-2">
+                  </div>
+                  <button class="btn btn-custom mx-2"> <!-- Añadí 'mx-2' para darle espacio horizontal -->
+                    <i class="bi bi-calendar-x-fill"></i> <!-- Ícono de calendario -->
+                  </button>
+                  <div class="input-group" style="max-width: 400px;">
+                    <span class="input-group-text input-group-text-custom ms-2">Fin:</span>
+                    <input type="text" class="input-custom me-2">
+                  </div>
+                  <button class="btn btn-custom mx-2"> <!-- Añadí 'mx-2' para darle espacio horizontal -->
+                    <i class="bi bi-calendar-x-fill"></i> <!-- Ícono de calendario -->
+                  </button>
+                  <div class="input-group" style="max-width: 400px;">
+                    <span class="input-group-text input-group-text-custom ms-2">Talent:</span>
+                    <select class="form-select form-select-custom">
+                      <option selected>Seleccione un miembro</option>
+                      <option value="1">Miembro 1</option>
+                      <option value="2">Miembro 2</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="col m-auto">
+                <div class="col m-auto">
+                  <button type="reset" class="btn btn-lg rounded-pill btn-custom me-3">Limpiar<i class="bi bi-trash ms-2"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="row m-auto mt-3">
+              <div class="col-md-10">
+                <div class="d-flex">
+                  <div class="input-group" style="max-width: 400px;">
+                    <span class="input-group-text input-group-text-custom">Categorías:</span>
+                    <select class="form-select form-select-custom">
+                      <option selected>Seleccione una Categoría</option>
+                      <option value="1">Categoría 1</option>
+                      <option value="2">Categoría 2</option>
+                      <option value="3">Categoría 3</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="col-auto">
+                  <button type="submit" class="btn btn-lg rounded-pill btn-custom2"><i class="bi bi-search me-3"></i>Buscar</button>
+                </div>
+              </div>
+            </div>
+
+        </div>
+      </form>
+    </div>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
