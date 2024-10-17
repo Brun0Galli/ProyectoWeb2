@@ -1,8 +1,8 @@
 <?php
 $servername = "localhost";
 $username = "pantera";
-$password = "panteracualquiera";
-$dbname = "panteras";
+$password = "cualquiera";
+$dbname = "panteras2";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
