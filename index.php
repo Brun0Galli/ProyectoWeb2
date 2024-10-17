@@ -1,8 +1,8 @@
 <?php
 $servername = "localhost";
 $username = "pantera";
-$password = "cualquiera";
-$dbname = "panteras2";
+$password = "panteracualquiera";
+$dbname = "panteras";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
@@ -57,19 +57,30 @@ if ($conn->connect_error) {
         }
 
         .btn-custom {
-            background-color: #6c757d;
-            border: none;
-            border-radius: 10px;
-            padding: 0.375rem 0.75rem;
-            color: white;
+        background-color: #6c757d; /* Color del botón */
+        border: none; /* Sin borde */
+        border-radius: 10px; /* Bordes redondeados */
+        padding: 0.375rem 0.75rem; /* Espaciado */
+        color: white;
         }
-
+        .btn-custom:hover {
+        background-color: #52595f;
+        }
+        .btn-custom:hover:active {
+        background-color: #52595f;
+        }
         .btn-custom2 {
-            background-color: #635e29;
-            border: none;
-            border-radius: 10px;
-            padding: 0.375rem 0.75rem;
-            color: white;
+        background-color: #635e29; /* Color del botón */
+        border: none; /* Sin borde */
+        border-radius: 10px; /* Bordes redondeados */
+        padding: 0.375rem 0.75rem; /* Espaciado */
+        color: white;
+        }
+        .btn-custom2:hover {
+        background-color: #5a5418; /* Color del botón */
+        }
+        .btn-custom2:hover:active {
+        background-color: #5a5418; /* Color del botón */
         }
 
         .btn-custom i {
@@ -133,19 +144,6 @@ if ($conn->connect_error) {
         <hr>
         <form class="row" id="filterForm">
             <div class="row">
-                <div class="col-3">
-                    <div class="input-group" style="max-width: 400px;">
-                        <span class="input-group-text input-group-text-custom">Sede:</span>
-                        <select class="form-select form-select-custom" id="sede">
-                            <option selected>Todas las sedes</option>
-                            <option value="1">Categoría 1</option>
-                            <option value="2">Categoría 2</option>
-                            <option value="3">Categoría 3</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
                 <div class="row m-auto mt-3">
                     <div class="col-md-10">
                         <div class="d-flex align-items-center">
@@ -193,6 +191,15 @@ if ($conn->connect_error) {
                     <div class="col-md-10">
                         <div class="d-flex">
                             <div class="input-group" style="max-width: 400px;">
+                                <span class="input-group-text input-group-text-custom">Sede:</span>
+                                <select class="form-select form-select-custom" id="sede">
+                                    <option selected>Todas las sedes</option>
+                                    <option value="1">Categoría 1</option>
+                                    <option value="2">Categoría 2</option>
+                                    <option value="3">Categoría 3</option>
+                                </select>
+                            </div>
+                            <div class="input-group ms-4" style="max-width: 400px;">
                                 <span class="input-group-text input-group-text-custom">Categorías:</span>
                                 <select class="form-select form-select-custom" id="categoria">
                                     <option selected>Seleccione una Categoría</option>
