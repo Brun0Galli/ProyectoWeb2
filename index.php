@@ -257,21 +257,28 @@ if ($conn->connect_error) {
 
         <!-- Filtros activados -->
         <div class="row my-3 filters-summary">
-            <div class="d-flex flex-row row m-auto mt-3">
+            <div class="d-flex flex-row row m-auto my-2">
                 <div class="col-md-2">
-                    Intervalo de Fechas
+                    Intervalo de Fechas: 
                 </div>
-                <div class="col-md-5" id="filterList-Fecha">
-                    <button class="btn-filter "><span>FilterList</span><i class="bi bi-trash ms-3"></i></button>
+                <div class="col-md-5" id="filterList-fechaInicio">
+                    <span class="me-2">DESDE:</span>
+                </div>
+                <div class="col-md-5" id="filterList-fechaFin">
+                    <span class="me-2">HASTA:</span>
                 </div>
             </div>
-            <div class="row m-auto mt-3" id="filterContainer-Talent">
-                <div class="col-md-10">
-                    Miembro Talent
-                </div>
-                <div class="col-md-10" id="filterList-Talent">
-                    
-                </div>
+            <div class="row m-auto my-2" id="filterContainer-talent">
+                <div class="col-md-10">Talent:</div>
+                <div class="col-md-10" id="filterList-talent"></div>
+            </div>
+            <div class="row m-auto my-2" id="filterContainer-sede">
+                <div class="col-md-10">Sede:</div>
+                <div class="col-md-10" id="filterList-sede"></div>
+            </div>
+            <div class="row m-auto my-2" id="filterContainer-categoria">
+                <div class="col-md-10">Categoria:</div>
+                <div class="col-md-10" id="filterList-categoria"></div>
             </div>
         </div>
 
@@ -382,32 +389,71 @@ if ($conn->connect_error) {
 
             // Limpiar
             $('#limpiarCampos').on('click', function() {
-                $('#filterForm')[0].reset(); // Resetea el formulario
+                $('#filterForm')[0].reset();
+                $('#filterList-fechaInicio').html("");
+                $('#filterList-fechaInicio').hide();
+                $('#filterList-fechaFin').html("");
+                $('#filterList-fechaFin').hide();
+                $("#filterList-talent").html("");
+                $('#filterContainer-talent').hide();
+                $("#filterList-sede").html("");
+                $('#filterContainer-sede').hide();
+                $("#filterList-categoria").html("");
+                $('#filterContainer-categoria').hide();
             });
 
             //Filtros
             //Fecha
-            var fechaInicioChangeToggle = false;
             $('#fechaInicio').on("change keyup paste",function () {
-                console.log(fechaInicioChangeToggle);
-                if(fechaInicioChangeToggle){
-                    $('#filterList-Fecha').append('<button class="btn-filter" onclick="deleteSelfFilter()"><span>'+$('#fechaInicio').val()+'</span><i class="bi bi-trash ms-3"></i></button>');
-                    $('#fechaInicio').val(""); 
+                if($('#fechaInicio').val() != ""){
+                    $('#filterList-fechaInicio').show();
+                    let innerValue = '<span class="me-2">DESDE:</span>' + "<span class='me-3'>"+ $('#fechaInicio').val() +"</span>";
+                    $('#filterList-fechaInicio').html(innerValue);
+                }else{
+                    $('#filterList-fechaInicio').hide();
                 }
-                fechaInicioChangeToggle = !fechaInicioChangeToggle;
             });
-            $('#talent').on("change keyup paste",function () {
-                    $("#filterContainer-Talent").show();
-                    let element = '<button class="btn-filter me-3" onclick="deleteSelfFilter(this)"><span value="'+
-                    $('#talent').val()+'">'+
-                    $('#talent option:selected').text()+
-                    '</span><i class="bi bi-trash ms-3"></i></button>';
-                    $('#filterList-Talent').append(element);
-                    $('#talent').val(""); 
+
+            $('#fechaFin').on("change keyup paste",function () {
+                if($('#fechaFin').val() != ""){
+                    $('#filterList-fechaFin').show();
+                    let innerValue = '<span class="me-2">HASTA:</span>' + "<span class='me-3'>"+ $('#fechaFin').val() +"</span>";
+                    $('#filterList-fechaFin').html(innerValue);
+                }else{
+                    $('#filterList-fechaFin').hide();
+                }
             });
+
+            $('#filterList-fechaInicio').hide();
+            $('#filterList-fechaFin').hide();
+            $("#filterContainer-"+"talent").hide();
+            $("#filterContainer-"+"sede").hide();
+            $("#filterContainer-"+"categoria").hide();
+            listenToFilter("talent");
+            listenToFilter("sede");
+            listenToFilter("categoria");
+
         });
         function ResultadoTab(){
             filters = getFilters();
+            filteryQuery = "";
+            console.log(filters);
+            
+            if(filters["sede"].length > 0){
+                filteryQuery += " AND asesoria.id_Sede IN ("+filters["sede"]+")";
+            }
+            if(filters["fechaInicio"] != ''){
+                filteryQuery += " AND asesoria.Fecha >= '"+filters["fechaInicio"]+"'";
+            }
+            if(filters["fechaFin"] != ''){
+                filteryQuery += " AND asesoria.Fecha <= '"+filters["fechaFin"]+"'";
+            }
+            if(filters["talent"].length > 0){
+                filteryQuery += " AND asesor.ID IN ("+filters["talent"]+")";
+            }
+            if(filters["categoria"].length > 0){
+                filteryQuery += " AND categoria.ID IN ("+filters["categoria"]+")";
+            }
             let query = "SELECT asesoria.ID, asesoria.Correo AS Correo, " +
             "asesoria.Fecha, asesoria.duracion AS Duracion, " +
             "categoria.Llave AS Categoria, asesor.nombre AS Asesor " +
@@ -415,7 +461,7 @@ if ($conn->connect_error) {
             "INNER JOIN asesoria_asesor ON asesor.ID = asesoria_asesor.id_Asesor " +
             "INNER JOIN asesoria ON asesoria_asesor.id_Asesoria = asesoria.ID " +
             "INNER JOIN categoria ON categoria.ID = asesoria.id_Categoria " +
-            "WHERE 1=1" + filters + " " +
+            "WHERE 1=1" + filteryQuery + " " +
             "ORDER BY asesoria.Fecha DESC;";
             console.log(query);
 
@@ -449,7 +495,70 @@ if ($conn->connect_error) {
 
         function CategoriasTab(){
             filters = getFilters();
-            let query = "WITH UniqueAsesores AS ( SELECT asesoria.id_Categoria, asesoria.ID, SUM(Duracion) AS Unique_Durations, COUNT(DISTINCT asesor.ID) AS Unique_Count FROM asesoria LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID GROUP BY asesoria.ID ) SELECT Llave AS 'Key', categoria.Nombre, COUNT(asesoria.id_Categoria) AS Sesiones, COUNT(DISTINCT asesoria.Correo) AS Profesores, TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60, 0)), '%H:%i') AS ProfesorHoras, TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60, 0)), '%H:%i') AS TalentHoras, TIME_FORMAT( SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), '%H:%i' ) AS ProfesoresMedia, TIME_FORMAT( SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), '%H:%i' ) AS TalentMedia FROM categoria LEFT JOIN asesoria ON categoria.ID = asesoria.id_Categoria LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID GROUP BY Llave;";
+            var filtersQuery = {};
+            console.log(filters);
+            
+            if(filters["sede"].length > 0){
+                filtersQuery["sede"] = " AND asesoria.id_Sede IN ("+filters["sede"]+")";
+            }else{
+                filtersQuery["sede"] = "";
+            }
+            if(filters["fechaInicio"] != ''){
+                filtersQuery["fechaInicio"] = " AND asesoria.Fecha >= '"+filters["fechaInicio"]+"'";
+            }else{
+                filtersQuery["fechaInicio"] = "";
+            }
+            if(filters["fechaFin"] != ''){
+                filtersQuery["fechaFin"] = " AND asesoria.Fecha <= '"+filters["fechaFin"]+"'";
+            }else{
+                filtersQuery["fechaFin"] = "";
+            }
+            if(filters["talent"].length > 0){
+                filtersQuery["talent"] = " AND asesor.ID IN ("+filters["talent"]+")";
+            }else{
+                filtersQuery["talent"] = "";
+            }
+            if(filters["categoria"].length > 0){
+                filtersQuery["categoria"] = " AND categoria.ID IN ("+filters["categoria"]+")";
+            }else{
+                filtersQuery["categoria"] = "";
+            }
+            let query =`
+            WITH UniqueAsesores AS (
+            SELECT 
+                    asesoria.id_Categoria,
+                    asesoria.ID,
+                    SUM(Duracion) AS Unique_Durations,
+                    COUNT(DISTINCT asesor.ID) AS Unique_Count
+                FROM 
+                    asesoria
+                LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
+                LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
+                GROUP BY 
+                    asesoria.ID
+            )
+            SELECT Llave AS "Key", categoria.Nombre, 
+            COUNT(asesoria.id_Categoria) AS Sesiones,
+            COUNT(DISTINCT asesoria.Correo) AS Profesores,
+                TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60, 0)), '%H:%i') AS ProfesorHoras,
+                TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60, 0)), '%H:%i') AS TalentHoras,
+                TIME_FORMAT(
+                    SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), 
+                    '%H:%i'
+                ) AS ProfesoresMedia,
+                TIME_FORMAT(
+                    SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), 
+                    '%H:%i'
+                ) AS TalentMedia
+
+
+            FROM categoria
+            LEFT JOIN asesoria ON categoria.ID = asesoria.id_Categoria`+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
+            LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
+            LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID`+filtersQuery["talent"]+`
+            LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID
+
+            GROUP BY Llave;`
             console.log(query);
 
             $.ajax({
@@ -483,35 +592,14 @@ if ($conn->connect_error) {
         }
 
         function getFilters(){
-            var sede = $('#sede').val();
-            var inicio = $('#fechaInicio').val();
-            var fin = $('#fechaFin').val();
-            var talent = $('#talent').val();
-            var categoria = $('#categoria').val();
+            var filters = {};
+            filters["sede"] = $('#filterList-sede span').map(function () {return $(this).attr('value')}).get();
+            filters["talent"] = $('#filterList-talent span').map(function () {return $(this).attr('value')}).get();
+            filters["categoria"] = $('#filterList-categoria span').map(function () {return $(this).attr('value')}).get();
+            filters["fechaInicio"] = $('#fechaInicio').val();
+            filters["fechaFin"] = $('#fechaFin').val();
 
-            sede = sede ? sede : '';
-            inicio = inicio ? inicio : '';
-            fin = fin ? fin : '';
-            talent = talent ? talent : '';
-            categoria = categoria ? categoria : '';
-
-            let filters = "";
-
-            if(sede != "0"){
-                filters += " AND asesoria.id_Sede = "+sede;
-            }
-            if(inicio != ""){
-                filters += " AND asesoria.Fecha >= '"+inicio+"'";
-            }
-            if(fin != ""){
-                filters += " AND asesoria.Fecha <= '"+fin+"'";
-            }
-            if(talent != "0"){
-                filters += " AND asesor.ID = "+talent;
-            }
-            if(categoria != "0"){
-                filters += " AND categoria.ID = "+categoria;
-            }
+            console.log(filters);
             return filters;
         }
 
@@ -520,6 +608,20 @@ if ($conn->connect_error) {
                 $(button).parent().parent().hide();
             }
             $(button).remove();
+        }
+
+        function listenToFilter(category){
+            $('#'+category).on("change keyup paste",function () {
+                    $("#filterContainer-"+category).show();
+
+                    let element = '<button class="btn-filter me-3" onclick="deleteSelfFilter(this)"><span value="'+
+                    $('#'+category).val()+'">'+
+                    $('#'+category+' option:selected').text()+
+                    '</span><i class="bi bi-trash ms-3"></i></button>';
+
+                    $('#filterList-'+category).append(element);
+                    $('#'+category).val("0"); 
+            });
         }
 
         ResultadoTab();
