@@ -57,30 +57,45 @@ if ($conn->connect_error) {
         }
 
         .btn-custom {
-        background-color: #6c757d; /* Color del botón */
-        border: none; /* Sin borde */
-        border-radius: 10px; /* Bordes redondeados */
-        padding: 0.375rem 0.75rem; /* Espaciado */
-        color: white;
+            background-color: #6c757d;
+            /* Color del botón */
+            border: none;
+            /* Sin borde */
+            border-radius: 10px;
+            /* Bordes redondeados */
+            padding: 0.375rem 0.75rem;
+            /* Espaciado */
+            color: white;
         }
+
         .btn-custom:hover {
-        background-color: #52595f;
+            background-color: #52595f;
         }
+
         .btn-custom:hover:active {
-        background-color: #52595f;
+            background-color: #52595f;
         }
+
         .btn-custom2 {
-        background-color: #635e29; /* Color del botón */
-        border: none; /* Sin borde */
-        border-radius: 10px; /* Bordes redondeados */
-        padding: 0.375rem 0.75rem; /* Espaciado */
-        color: white;
+            background-color: #635e29;
+            /* Color del botón */
+            border: none;
+            /* Sin borde */
+            border-radius: 10px;
+            /* Bordes redondeados */
+            padding: 0.375rem 0.75rem;
+            /* Espaciado */
+            color: white;
         }
+
         .btn-custom2:hover {
-        background-color: #5a5418; /* Color del botón */
+            background-color: #5a5418;
+            /* Color del botón */
         }
+
         .btn-custom2:hover:active {
-        background-color: #5a5418; /* Color del botón */
+            background-color: #5a5418;
+            /* Color del botón */
         }
 
         .btn-custom i {
@@ -88,14 +103,14 @@ if ($conn->connect_error) {
         }
 
         .daterangepicker {
-            background-color: #333;
+            background-color: white;
             /* Fondo oscuro */
-            color: white;
+            color: black;
             /* Texto blanco */
         }
 
         .daterangepicker .calendar-table {
-            color: white;
+            color: black;
         }
 
         .daterangepicker td.active,
@@ -127,6 +142,48 @@ if ($conn->connect_error) {
         .daterangepicker .applyBtn:hover,
         .daterangepicker .cancelBtn:hover {
             background-color: #6c757d;
+        }
+
+        .resumen-filtros {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 20px;
+            margin-top: 15px;
+        }
+
+        .filtro-tag {
+            background-color: #6c757d;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-right: 5px;
+            display: inline-block;
+        }
+
+        .resultados-tira {
+            background-color: #dbb90f;
+            padding: 10px;
+            border-radius: 20px;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 70%;
+        }
+
+        .stat-box {
+            /* Color dorado */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -194,9 +251,10 @@ if ($conn->connect_error) {
                                 <span class="input-group-text input-group-text-custom">Sede:</span>
                                 <select class="form-select form-select-custom" id="sede">
                                     <option selected>Todas las sedes</option>
-                                    <option value="1">Categoría 1</option>
-                                    <option value="2">Categoría 2</option>
-                                    <option value="3">Categoría 3</option>
+                                    <option value="1">CDMX</option>
+                                    <option value="2">AGS</option>
+                                    <option value="3">GDL</option>
+                                    <option value="5">CUP</option>
                                 </select>
                             </div>
                             <div class="input-group ms-4" style="max-width: 400px;">
@@ -226,78 +284,165 @@ if ($conn->connect_error) {
                 </div>
             </div>
         </form>
-    </div>
+        <div class="resumen-filtros" id="resumenFiltros">
+            <div class="row">
+                <div class=" col-md-2">
+                    <div class="row m-auto">
+                        Intervalo de Fechas:
+                    </div>
+                    <div class="row m-auto mt-3">
+                        Miembro Talent:
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row m-auto">
+                        <div id="fechasSeleccionadas">
 
-    <!-- Scripts -->
-    <script>
-        $(document).ready(function() {
-            // Inicializar el calendario
-            $('#calendarioInicio').on('click', function() {
-                $('#fechaInicio').daterangepicker({
-                    singleDatePicker: true,
-                    timePicker: true,
-                    timePicker24Hour: true,
-                    showDropdowns: true, // Agregar dropdowns para seleccionar el año y el mes
-                    locale: {
-                        format: 'YYYY-MM-DD HH:mm',
-                        applyLabel: "Aplicar",
-                        cancelLabel: "Cancelar",
-                        daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
-                        monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-                        firstDay: 1 // Comienza la semana en lunes
+                        </div>
+                    </div>
+                    <div class="row m-auto mt-4">
+                        <div id="filtrosSeleccionados">
+                            <!-- Aquí se mostrarán los filtros seleccionados -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="resultados-tira" id="resultados">
+            <div class="row m-auto">
+                <div class="d-flex">
+                    <div class="col m-auto">
+                        <div class="stat-box">
+                            <div class="stat-number" id="statSession">164</div>
+                            <div class="stat-label">Sesiones</div>
+                        </div>
+                    </div>
+                    <div class="col m-auto">
+                        <div class="stat-box">
+                            <div class="stat-number" id="statHrTotal">145:45</div>
+                            <div class="stat-label">Total Hrs. Profesor</div>
+                        </div>
+                    </div>
+                    <div class="col m-auto">
+                        <div class="stat-box">
+                            <div class="stat-number" id="statDurMedia">0:53</div>
+                            <div class="stat-label">Duración Media Sesión</div>
+                        </div>
+                    </div>
+                    <div class="col m-auto">
+                        <div class="stat-box">
+                            <div class="stat-number" id="statHrTotalTalent">147:15</div>
+                            <div class="stat-label">Total Hrs. Talent</div>
+                        </div>
+                    </div>
+                    <div class="col m-auto">
+                        <div class="stat-box">
+                            <div class="stat-number" id="statAlumnosAtendidos">126</div>
+                            <div class="stat-label">Profesores</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+
+        <!-- Scripts -->
+        <script>
+            $(document).ready(function() {
+
+                var filtros = {};
+                var fechas = {};
+
+                // Agregar filtros seleccionados al resumen
+                function actualizarResumen() {
+                    var resumen = $("#filtrosSeleccionados");
+
+                    resumen.empty(); // Limpiar el resumen visual
+                    $.each(filtros, function(clave, valor) {
+                        resumen.append('<span class="filtro-tag">' + clave + ': ' + valor + '</span>');
+                    });
+                }
+
+                function actualizarFechas() {
+                    var resumen = $("#fechasSeleccionadas");
+
+                    resumen.empty(); //
+                    $.each(fechas, function(clave, valor) {
+                        resumen.append('<span class="filtro-tag">' + clave + ': ' + valor + '</span>');
+                    });
+                }
+                // Cuando se selecciona un talent, se agrega automáticamente al resumen
+                $('#talent').on('change', function() {
+                    var talentText = $('#talent option:selected').text();
+                    if (talentText !== "Seleccione un miembro") {
+                        filtros["Talent"] = talentText;
+                        actualizarResumen();
                     }
                 });
-            });
-
-            $('#calendarioFin').on('click', function() {
-                $('#fechaFin').daterangepicker({
-                    singleDatePicker: true,
-                    timePicker: true,
-                    timePicker24Hour: true,
-                    showDropdowns: true, // Agregar dropdowns para seleccionar el año y el mes
-                    locale: {
-                        format: 'YYYY-MM-DD HH:mm',
-                        applyLabel: "Aplicar",
-                        cancelLabel: "Cancelar",
-                        daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
-                        monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-                        firstDay: 1 // Comienza la semana en lunes
+                $('#fechaInicio').on('change', function() {
+                    var fechaInicio = $('#fechaInicio').val();
+                    if (fechaInicio) {
+                        fechas["Inicio"] = fechaInicio;
+                        actualizarFechas();
                     }
                 });
-            });
-
-            // Buscar
-            $('#buscar').on('click', function(e) {
-                e.preventDefault();
-                // Aquí ejecutas el query con AJAX
-                var sede = $('#sede').val();
-                var inicio = $('#fechaInicio').val();
-                var fin = $('#fechaFin').val();
-                var talent = $('#talent').val();
-                var categoria = $('#categoria').val();
-
-                $.ajax({
-                    url: 'buscar.php', // Aquí pones el archivo PHP que ejecuta el query
-                    method: 'POST',
-                    data: {
-                        sede: sede,
-                        inicio: inicio,
-                        fin: fin,
-                        talent: talent,
-                        categoria: categoria
-                    },
-                    success: function(response) {
-                        // Aquí muestras los resultados
+                $('#fechaFin').on('change', function() {
+                    var fechaFin = $('#fechaFin').val();
+                    if (fechaFin) {
+                        fechas["Fin"] = fechaFin;
+                        actualizarFechas();
                     }
                 });
-            });
 
-            // Limpiar
-            $('#limpiarCampos').on('click', function() {
-                $('#filterForm')[0].reset(); // Resetea el formulario
+                // Inicializar el calendario
+                $('#calendarioInicio').on('click', function() {
+                    $('#fechaInicio').daterangepicker({
+                        singleDatePicker: true,
+                        timePicker: true,
+                        timePicker24Hour: true,
+                        showDropdowns: true, // Agregar dropdowns para seleccionar el año y el mes
+                        locale: {
+                            format: 'YYYY-MM-DD HH:mm',
+                            applyLabel: "Aplicar",
+                            cancelLabel: "Cancelar",
+                            daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
+                            monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+                            firstDay: 1 // Comienza la semana en lunes
+                        }
+                    });
+                });
+
+                $('#calendarioFin').on('click', function() {
+                    $('#fechaFin').daterangepicker({
+                        singleDatePicker: true,
+                        timePicker: true,
+                        timePicker24Hour: true,
+                        showDropdowns: true, // Agregar dropdowns para seleccionar el año y el mes
+                        locale: {
+                            format: 'YYYY-MM-DD HH:mm',
+                            applyLabel: "Aplicar",
+                            cancelLabel: "Cancelar",
+                            daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
+                            monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+                            firstDay: 1 // Comienza la semana en lunes
+                        }
+                    });
+                });
+
+                // Buscar
+
+                // Limpiar
+                $('#limpiarCampos').on('click', function() {
+                    $('#filterForm')[0].reset(); // Limpiar los campos del formulario
+                    filtros = {};
+                    fechas = {}; // Vaciar el objeto de filtros
+                    actualizarResumen();
+                    actualizarFechas(); // Actualizar el resumen visual
+                    $('#resultados').empty();
+                });
             });
-        });
-    </script>
+        </script>
 </body>
 
 </html>
