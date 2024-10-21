@@ -7,7 +7,9 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
-} ?>
+}
+
+?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -185,6 +187,71 @@ if ($conn->connect_error) {
         .stat-label {
             font-size: 1rem;
         }
+
+        /* Encabezado de la tabla */
+        .table-custom thead th {
+            background-color: #1e1e1e;
+            /* Color de fondo de los encabezados */
+            color: #f1b24a;
+            /* Color de texto dorado */
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        /* Estilo de las celdas */
+        .table-custom tbody td {
+            padding: 10px;
+            border-color: #1e1e1e;
+            background-color: #1e1e1e;
+        }
+
+        /* Efecto hover para las filas */
+        .table-custom tbody tr:hover {
+            background-color: #444;
+            /* Color de fondo al pasar el cursor */
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .nav-menu a {
+            margin: 0 15px;
+            padding: 10px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-menu a:hover {
+            color: #f1b24a;
+            /* Efecto hover, color dorado */
+        }
+
+        .nav-menu a.active {
+            color: #f1b24a;
+            /* Color para el enlace activo */
+        }
+
+        /* Secciones de contenido */
+        .section {
+            padding: 50px;
+            margin-top: 20px;
+            display: none;
+            /* Ocultar todas las secciones por defecto */
+        }
+
+        .section.active {
+            display: block;
+            /* Mostrar solo la sección activa */
+        }
     </style>
 </head>
 
@@ -309,7 +376,7 @@ if ($conn->connect_error) {
             </div>
         </div>
 
-        <div class="resultados-tira" id="resultados">
+        <div class="resultados-tira" id="resultadosTira">
             <div class="row m-auto">
                 <div class="d-flex">
                     <div class="col m-auto">
@@ -345,8 +412,201 @@ if ($conn->connect_error) {
                 </div>
             </div>
         </div>
-        <hr>
 
+        <div class="container mt-5">
+            <nav class="nav-menu">
+                <a href="#resultados" id="link-resultados" class="active">Resultados</a>
+                <a href="#categorias" id="link-categorias">Categorías</a>
+                <a href="#asesores" id="link-asesores">Asesores</a>
+            </nav>
+
+            <div id="resultados" class="section active">
+                <table class="table table-hover table-dark table-custom">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Correo</th>
+                            <th>Fecha</th>
+                            <th>Duración</th>
+                            <th>Categoría</th>
+                            <th>Asesor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        function convertirMinutos($minutos)
+                        {
+                            $horas = floor($minutos / 60);  // Horas completas
+                            $minutosRestantes = $minutos % 60;  // Minutos restantes
+                            return sprintf("%02d:%02d", $horas, $minutosRestantes);  // Formato hh:mm
+                        }
+                        $results_per_page = 50;
+
+                        // Obtener el número total de registros
+                        $total_results_sql = "SELECT COUNT(*) AS total FROM asesoria";
+                        $total_results_result = $conn->query($total_results_sql);
+                        $total_row = $total_results_result->fetch_assoc();
+                        $total_results = $total_row['total'];
+
+                        // Calcular el número total de páginas
+                        $total_pages = ceil($total_results / $results_per_page);
+
+                        // Obtener el número de página actual desde la URL, si no está definido, será la página 1
+                        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+                        // Calcular el OFFSET para la consulta SQL
+                        $start_from = ($page - 1) * $results_per_page;
+
+                        // Consulta SQL con paginación
+                        $sql = "SELECT a.ID AS asesoria_id, a.Correo, a.Fecha, a.Duracion, c.Nombre AS categoria, ase.Nombre AS asesor 
+                        FROM asesoria a 
+                        JOIN categoria c ON a.id_Categoria = c.ID 
+                        JOIN asesoria_asesor aa ON a.ID = aa.id_Asesoria 
+                        JOIN asesor ase ON aa.id_Asesor = ase.ID 
+                        ORDER BY a.Fecha DESC 
+                        LIMIT $results_per_page OFFSET $start_from";
+
+                        $result = $conn->query($sql);
+
+                        if (!$result) {
+                            die("Query error: " . $conn->error);
+                        }
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo "<tr>";
+                                echo "<td>" . $row["asesoria_id"] . "</td>";
+                                echo "<td>" . $row["Correo"] . "</td>";
+                                echo "<td>" . date("d-m-Y H:i:s", strtotime($row["Fecha"])) . "</td>";
+                                echo "<td>" . convertirMinutos($row["Duracion"]) . "</td>";
+                                echo "<td>" . $row["categoria"] . "</td>";
+                                echo "<td>" . $row["asesor"] . "</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='6'>No se encontraron resultados</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+
+                <!-- Navegación de paginación -->
+                <nav>
+                    <ul class="pagination">
+                        <?php
+                        // Botón "anterior"
+                        if ($page > 1) {
+                            echo "<li class='page-item'><a class='page-link' href='?page=" . ($page - 1) . "'>Anterior</a></li>";
+                        }
+
+                        // Botones de números de página
+                        for ($i = 1; $i <= $total_pages; $i++) {
+                            if ($i == $page) {
+                                echo "<li class='page-item active'><a class='page-link' href='?page=$i'>$i</a></li>";
+                            } else {
+                                echo "<li class='page-item'><a class='page-link' href='?page=$i'>$i</a></li>";
+                            }
+                        }
+
+                        // Botón "siguiente"
+                        if ($page < $total_pages) {
+                            echo "<li class='page-item'><a class='page-link' href='?page=" . ($page + 1) . "'>Siguiente</a></li>";
+                        }
+                        ?>
+                    </ul>
+                </nav>
+            </div>
+            <div id="categorias" class="section">
+                <h2>Categorías</h2>
+                <table class="table table-hover table-dark table-custom">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Nombre</th>
+                            <th>Sesiones</th>
+                            <th>Profesores</th>
+                            <th>Total Horas Prof</th>
+                            <th>Total Horas Talent</th>
+                            <th>Duración Media Prof</th>
+                            <th>Duración Media Talent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Query para obtener el resumen por categoría
+                        $sql = "
+SELECT 
+    c.ID AS categoria_id,
+    c.Nombre AS categoria_nombre,
+    COUNT(DISTINCT a.ID) AS sesiones,
+    COUNT(DISTINCT a.Correo) AS profesores,
+    SUM(a.Duracion) AS total_horas_prof,
+    SUM(a.Duracion) AS total_horas_talent, -- Esto puede cambiar si manejas horas de talent de otra manera
+    AVG(a.Duracion) AS duracion_media_prof,
+    AVG(a.Duracion) AS duracion_media_talent -- Asumiendo que las horas de talent son iguales a las de profesor
+FROM asesoria a
+JOIN categoria c ON a.id_Categoria = c.ID
+JOIN asesoria_asesor aa ON a.ID = aa.id_Asesoria
+JOIN asesor ase ON aa.id_Asesor = ase.ID
+GROUP BY c.ID, c.Nombre
+ORDER BY c.Nombre;
+";
+                        $result = $conn->query($sql);
+
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo "<tr>";
+                                echo "<td>" . $row["categoria_id"] . "</td>";
+                                echo "<td>" . $row["categoria_nombre"] . "</td>";
+                                echo "<td>" . $row["sesiones"] . "</td>";
+                                echo "<td>" . $row["profesores"] . "</td>";
+                                echo "<td>" . convertirMinutos($row["total_horas_prof"]) . "</td>";  // Convertir minutos a hh:mm
+                                echo "<td>" . convertirMinutos($row["total_horas_talent"]) . "</td>";  // Convertir minutos a hh:mm
+                                echo "<td>" . convertirMinutos($row["duracion_media_prof"]) . "</td>";  // Convertir minutos a hh:mm
+                                echo "<td>" . convertirMinutos($row["duracion_media_talent"]) . "</td>";  // Convertir minutos a hh:mm
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='8'>No se encontraron resultados</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+            <div id="asesores" class="section">
+                <h2>Asesores</h2>
+                <table class="table table-hover table-dark table-custom">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Especialidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Query para obtener la información de los asesores
+                        $sql = "SELECT ase.ID, ase.Nombre, ase.Correo, 'Especialidad' AS especialidad FROM asesor ase";
+                        $result = $conn->query($sql);
+
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo "<tr>";
+                                echo "<td>" . $row["ID"] . "</td>";
+                                echo "<td>" . $row["Nombre"] . "</td>";
+                                echo "<td>" . $row["Correo"] . "</td>";
+                                echo "<td>" . $row["especialidad"] . "</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='4'>No se encontraron asesores</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
         <!-- Scripts -->
         <script>
             $(document).ready(function() {
@@ -440,6 +700,42 @@ if ($conn->connect_error) {
                     actualizarResumen();
                     actualizarFechas(); // Actualizar el resumen visual
                     $('#resultados').empty();
+                });
+            });
+            document.addEventListener("DOMContentLoaded", function() {
+                // Obtener todos los enlaces del menú y todas las secciones
+                const links = document.querySelectorAll(".nav-menu a");
+                const sections = document.querySelectorAll(".section");
+
+                // Función para cambiar de sección
+                function showSection(hash) {
+                    // Ocultar todas las secciones
+                    sections.forEach(section => {
+                        section.classList.remove("active");
+                    });
+
+                    // Remover clase "active" de todos los enlaces
+                    links.forEach(link => {
+                        link.classList.remove("active");
+                    });
+
+                    // Mostrar la sección correcta y resaltar el enlace activo
+                    document.querySelector(hash).classList.add("active");
+                    document.querySelector(`a[href='${hash}']`).classList.add("active");
+                }
+
+                // Detectar el hash actual en la URL y mostrar la sección correspondiente
+                const currentHash = window.location.hash || "#resultados";
+                showSection(currentHash);
+
+                // Añadir evento click a cada enlace
+                links.forEach(link => {
+                    link.addEventListener("click", function(event) {
+                        event.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
+                        const hash = this.getAttribute("href");
+                        window.location.hash = hash; // Cambiar la URL
+                        showSection(hash); // Mostrar la sección correspondiente
+                    });
                 });
             });
         </script>
