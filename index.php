@@ -25,234 +25,7 @@ if ($conn->connect_error) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-
-    <style>
-        body {
-            background-color: #1e1e1e;
-            color: #fff;
-        }
-
-        .input-group {
-            width: auto;
-        }
-
-        .input-group-text-custom {
-            background-color: #333;
-            color: #807834;
-            border-radius: 20px 0 0 20px;
-            border: none;
-            padding: 0.375rem 0.75rem;
-        }
-
-        .form-select-custom {
-            background-color: #333;
-            color: #6c757d;
-            border: none;
-            border-radius: 20px;
-        }
-
-        .input-custom {
-            background-color: #333;
-            color: white;
-            border: none;
-            border-radius: 20px;
-        }
-
-        .btn-custom {
-            background-color: #6c757d;
-            /* Color del botón */
-            border: none;
-            /* Sin borde */
-            border-radius: 10px;
-            /* Bordes redondeados */
-            padding: 0.375rem 0.75rem;
-            /* Espaciado */
-            color: white;
-        }
-
-        .btn-custom:hover {
-            background-color: #52595f;
-        }
-
-        .btn-custom:hover:active {
-            background-color: #52595f;
-        }
-
-        .btn-custom2 {
-            background-color: #635e29;
-            /* Color del botón */
-            border: none;
-            /* Sin borde */
-            border-radius: 10px;
-            /* Bordes redondeados */
-            padding: 0.375rem 0.75rem;
-            /* Espaciado */
-            color: white;
-        }
-
-        .btn-custom2:hover {
-            background-color: #5a5418;
-            /* Color del botón */
-        }
-
-        .btn-custom2:hover:active {
-            background-color: #5a5418;
-            /* Color del botón */
-        }
-
-        .btn-custom i {
-            font-size: 1.2rem;
-        }
-
-        .daterangepicker {
-            background-color: white;
-            /* Fondo oscuro */
-            color: black;
-            /* Texto blanco */
-        }
-
-        .daterangepicker .calendar-table {
-            color: black;
-        }
-
-        .daterangepicker td.active,
-        .daterangepicker td.active:hover {
-            background-color: #635e29;
-            /* Color del fondo activo */
-            color: white;
-        }
-
-        .daterangepicker td.start-date,
-        .daterangepicker td.end-date {
-            background-color: #635e29;
-            color: white;
-        }
-
-        .daterangepicker td.available:hover {
-            background-color: #6c757d;
-            /* Color del hover */
-            color: white;
-        }
-
-        .daterangepicker .applyBtn,
-        .daterangepicker .cancelBtn {
-            background-color: #635e29;
-            /* Botones aplicar/cancelar */
-            border: none;
-        }
-
-        .daterangepicker .applyBtn:hover,
-        .daterangepicker .cancelBtn:hover {
-            background-color: #6c757d;
-        }
-
-        .resumen-filtros {
-            background-color: #333;
-            padding: 10px;
-            border-radius: 20px;
-            margin-top: 15px;
-        }
-
-        .filtro-tag {
-            background-color: #6c757d;
-            border-radius: 5px;
-            padding: 5px 10px;
-            margin-right: 5px;
-            display: inline-block;
-        }
-
-        .resultados-tira {
-            background-color: #dbb90f;
-            padding: 10px;
-            border-radius: 20px;
-            margin-top: 50px;
-            margin-bottom: 50px;
-            margin-left: auto;
-            margin-right: auto;
-            max-width: 70%;
-        }
-
-        .stat-box {
-            /* Color dorado */
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-
-        .stat-label {
-            font-size: 1rem;
-        }
-
-        /* Encabezado de la tabla */
-        .table-custom thead th {
-            background-color: #1e1e1e;
-            /* Color de fondo de los encabezados */
-            color: #f1b24a;
-            /* Color de texto dorado */
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: left;
-        }
-
-        /* Estilo de las celdas */
-        .table-custom tbody td {
-            padding: 10px;
-            border-color: #1e1e1e;
-            background-color: #1e1e1e;
-        }
-
-        /* Efecto hover para las filas */
-        .table-custom tbody tr:hover {
-            background-color: #444;
-            /* Color de fondo al pasar el cursor */
-        }
-
-        .pagination {
-            justify-content: center;
-        }
-
-        .nav-menu {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .nav-menu a {
-            margin: 0 15px;
-            padding: 10px;
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-        }
-
-        .nav-menu a:hover {
-            color: #f1b24a;
-            /* Efecto hover, color dorado */
-        }
-
-        .nav-menu a.active {
-            color: #f1b24a;
-            /* Color para el enlace activo */
-        }
-
-        /* Secciones de contenido */
-        .section {
-            padding: 50px;
-            margin-top: 20px;
-            display: none;
-            /* Ocultar todas las secciones por defecto */
-        }
-
-        .section.active {
-            display: block;
-            /* Mostrar solo la sección activa */
-        }
-    </style>
+    <link href="style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -437,7 +210,7 @@ if ($conn->connect_error) {
                         function convertirMinutos($minutos)
                         {
                             $horas = floor($minutos / 60);  // Horas completas
-                            $minutosRestantes = $minutos % 60;  // Minutos restantes
+                            $minutosRestantes = round((float) $minutos) % 60;  // Minutos restantes
                             return sprintf("%02d:%02d", $horas, $minutosRestantes);  // Formato hh:mm
                         }
                         $results_per_page = 50;
@@ -534,22 +307,22 @@ if ($conn->connect_error) {
                         <?php
                         // Query para obtener el resumen por categoría
                         $sql = "
-SELECT 
-    c.ID AS categoria_id,
-    c.Nombre AS categoria_nombre,
-    COUNT(DISTINCT a.ID) AS sesiones,
-    COUNT(DISTINCT a.Correo) AS profesores,
-    SUM(a.Duracion) AS total_horas_prof,
-    SUM(a.Duracion) AS total_horas_talent, -- Esto puede cambiar si manejas horas de talent de otra manera
-    AVG(a.Duracion) AS duracion_media_prof,
-    AVG(a.Duracion) AS duracion_media_talent -- Asumiendo que las horas de talent son iguales a las de profesor
-FROM asesoria a
-JOIN categoria c ON a.id_Categoria = c.ID
-JOIN asesoria_asesor aa ON a.ID = aa.id_Asesoria
-JOIN asesor ase ON aa.id_Asesor = ase.ID
-GROUP BY c.ID, c.Nombre
-ORDER BY c.Nombre;
-";
+                        SELECT 
+                            c.ID AS categoria_id,
+                            c.Nombre AS categoria_nombre,
+                            COUNT(DISTINCT a.ID) AS sesiones,
+                            COUNT(DISTINCT a.Correo) AS profesores,
+                            SUM(a.Duracion) AS total_horas_prof,
+                            SUM(a.Duracion) AS total_horas_talent, -- Esto puede cambiar si manejas horas de talent de otra manera
+                            AVG(a.Duracion) AS duracion_media_prof,
+                            AVG(a.Duracion) AS duracion_media_talent -- Asumiendo que las horas de talent son iguales a las de profesor
+                        FROM asesoria a
+                        JOIN categoria c ON a.id_Categoria = c.ID
+                        JOIN asesoria_asesor aa ON a.ID = aa.id_Asesoria
+                        JOIN asesor ase ON aa.id_Asesor = ase.ID
+                        GROUP BY c.ID, c.Nombre
+                        ORDER BY c.Nombre;
+                        ";
                         $result = $conn->query($sql);
 
                         if ($result->num_rows > 0) {
@@ -608,137 +381,7 @@ ORDER BY c.Nombre;
 
         </div>
         <!-- Scripts -->
-        <script>
-            $(document).ready(function() {
-
-                var filtros = {};
-                var fechas = {};
-
-                // Agregar filtros seleccionados al resumen
-                function actualizarResumen() {
-                    var resumen = $("#filtrosSeleccionados");
-
-                    resumen.empty(); // Limpiar el resumen visual
-                    $.each(filtros, function(clave, valor) {
-                        resumen.append('<span class="filtro-tag">' + clave + ': ' + valor + '</span>');
-                    });
-                }
-
-                function actualizarFechas() {
-                    var resumen = $("#fechasSeleccionadas");
-
-                    resumen.empty(); //
-                    $.each(fechas, function(clave, valor) {
-                        resumen.append('<span class="filtro-tag">' + clave + ': ' + valor + '</span>');
-                    });
-                }
-                // Cuando se selecciona un talent, se agrega automáticamente al resumen
-                $('#talent').on('change', function() {
-                    var talentText = $('#talent option:selected').text();
-                    if (talentText !== "Seleccione un miembro") {
-                        filtros["Talent"] = talentText;
-                        actualizarResumen();
-                    }
-                });
-                $('#fechaInicio').on('change', function() {
-                    var fechaInicio = $('#fechaInicio').val();
-                    if (fechaInicio) {
-                        fechas["Inicio"] = fechaInicio;
-                        actualizarFechas();
-                    }
-                });
-                $('#fechaFin').on('change', function() {
-                    var fechaFin = $('#fechaFin').val();
-                    if (fechaFin) {
-                        fechas["Fin"] = fechaFin;
-                        actualizarFechas();
-                    }
-                });
-
-                // Inicializar el calendario
-                $('#calendarioInicio').on('click', function() {
-                    $('#fechaInicio').daterangepicker({
-                        singleDatePicker: true,
-                        timePicker: true,
-                        timePicker24Hour: true,
-                        showDropdowns: true, // Agregar dropdowns para seleccionar el año y el mes
-                        locale: {
-                            format: 'YYYY-MM-DD HH:mm',
-                            applyLabel: "Aplicar",
-                            cancelLabel: "Cancelar",
-                            daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
-                            monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-                            firstDay: 1 // Comienza la semana en lunes
-                        }
-                    });
-                });
-
-                $('#calendarioFin').on('click', function() {
-                    $('#fechaFin').daterangepicker({
-                        singleDatePicker: true,
-                        timePicker: true,
-                        timePicker24Hour: true,
-                        showDropdowns: true, // Agregar dropdowns para seleccionar el año y el mes
-                        locale: {
-                            format: 'YYYY-MM-DD HH:mm',
-                            applyLabel: "Aplicar",
-                            cancelLabel: "Cancelar",
-                            daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
-                            monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-                            firstDay: 1 // Comienza la semana en lunes
-                        }
-                    });
-                });
-
-                // Buscar
-
-                // Limpiar
-                $('#limpiarCampos').on('click', function() {
-                    $('#filterForm')[0].reset(); // Limpiar los campos del formulario
-                    filtros = {};
-                    fechas = {}; // Vaciar el objeto de filtros
-                    actualizarResumen();
-                    actualizarFechas(); // Actualizar el resumen visual
-                    $('#resultados').empty();
-                });
-            });
-            document.addEventListener("DOMContentLoaded", function() {
-                // Obtener todos los enlaces del menú y todas las secciones
-                const links = document.querySelectorAll(".nav-menu a");
-                const sections = document.querySelectorAll(".section");
-
-                // Función para cambiar de sección
-                function showSection(hash) {
-                    // Ocultar todas las secciones
-                    sections.forEach(section => {
-                        section.classList.remove("active");
-                    });
-
-                    // Remover clase "active" de todos los enlaces
-                    links.forEach(link => {
-                        link.classList.remove("active");
-                    });
-
-                    // Mostrar la sección correcta y resaltar el enlace activo
-                    document.querySelector(hash).classList.add("active");
-                    document.querySelector(`a[href='${hash}']`).classList.add("active");
-                }
-
-                // Detectar el hash actual en la URL y mostrar la sección correspondiente
-                const currentHash = window.location.hash || "#resultados";
-                showSection(currentHash);
-
-                // Añadir evento click a cada enlace
-                links.forEach(link => {
-                    link.addEventListener("click", function(event) {
-                        event.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
-                        const hash = this.getAttribute("href");
-                        window.location.hash = hash; // Cambiar la URL
-                        showSection(hash); // Mostrar la sección correspondiente
-                    });
-                });
-            });
-        </script>
+        <script src="script.js"></script>
 </body>
 
 </html>

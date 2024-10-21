@@ -1,82 +1,225 @@
-body{
-    background-color: black;
+body {
+    background-color: #1e1e1e;
+    color: #fff;
 }
 
-.filters-gap{
-    display: flex;
-    gap: 1rem;
+.input-group {
+    width: auto;
 }
 
-#buttons{
-    gap: 0.5rem;
+.input-group-text-custom {
+    background-color: #333;
+    color: #807834;
+    border-radius: 20px 0 0 20px;
+    border: none;
+    padding: 0.375rem 0.75rem;
 }
 
-.filter-box{
-    background-color: rgb(77, 76, 76);
-    border-radius: 25px;
-    padding: auto;
+.form-select-custom {
+    background-color: #333;
+    color: #6c757d;
+    border: none;
+    border-radius: 20px;
+}
+
+.input-custom {
+    background-color: #333;
     color: white;
-    text-align: left;
-    padding: 0.5rem;
+    border: none;
+    border-radius: 20px;
 }
 
-.button-box{
-    display: flex;
-    gap: 0.25rem;
-    background-color: rgb(124, 124, 124);
-    border-radius: 25px;
-    padding: auto;
+.btn-custom {
+    background-color: #6c757d;
+    /* Color del botón */
+    border: none;
+    /* Sin borde */
+    border-radius: 10px;
+    /* Bordes redondeados */
+    padding: 0.375rem 0.75rem;
+    /* Espaciado */
     color: white;
-    text-align: left;
-    padding: 0.5rem;
-    justify-content: center;
-    align-items: center;
-    transition: all 500ms;
 }
 
-.button-box:hover{
-    background-color: rgb(104, 104, 104);
-}
-.button-box:hover:active{
-    background-color: rgb(104, 104, 104);
+.btn-custom:hover {
+    background-color: #52595f;
 }
 
-.calendar-box{
+.btn-custom:hover:active {
+    background-color: #52595f;
+}
+
+.btn-custom2 {
+    background-color: #635e29;
+    /* Color del botón */
+    border: none;
+    /* Sin borde */
+    border-radius: 10px;
+    /* Bordes redondeados */
+    padding: 0.375rem 0.75rem;
+    /* Espaciado */
+    color: white;
+}
+
+.btn-custom2:hover {
+    background-color: #5a5418;
+    /* Color del botón */
+}
+
+.btn-custom2:hover:active {
+    background-color: #5a5418;
+    /* Color del botón */
+}
+
+.btn-custom i {
+    font-size: 1.2rem;
+}
+
+.daterangepicker {
+    background-color: white;
+    /* Fondo oscuro */
+    color: black;
+    /* Texto blanco */
+}
+
+.daterangepicker .calendar-table {
+    color: black;
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+    background-color: #635e29;
+    /* Color del fondo activo */
+    color: white;
+}
+
+.daterangepicker td.start-date,
+.daterangepicker td.end-date {
+    background-color: #635e29;
+    color: white;
+}
+
+.daterangepicker td.available:hover {
+    background-color: #6c757d;
+    /* Color del hover */
+    color: white;
+}
+
+.daterangepicker .applyBtn,
+.daterangepicker .cancelBtn {
+    background-color: #635e29;
+    /* Botones aplicar/cancelar */
+    border: none;
+}
+
+.daterangepicker .applyBtn:hover,
+.daterangepicker .cancelBtn:hover {
+    background-color: #6c757d;
+}
+
+.resumen-filtros {
+    background-color: #333;
+    padding: 10px;
+    border-radius: 20px;
+    margin-top: 15px;
+}
+
+.filtro-tag {
+    background-color: #6c757d;
     border-radius: 5px;
-    width: 2.5rem;
-    height: 2.5rem;
+    padding: 5px 10px;
+    margin-right: 5px;
+    display: inline-block;
 }
 
-.button-std{
-    width: 8rem;
-    height: 2.5rem;
+.resultados-tira {
+    background-color: #dbb90f;
+    padding: 10px;
+    border-radius: 20px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 70%;
 }
 
-.box-std{
-    width: 10rem;
-    height: 2.5rem;
+.stat-box {
+    /* Color dorado */
+    color: white;
+    padding: 20px;
+    text-align: center;
 }
 
-.box-med{
-    width: 16rem;
-    height: 2.5rem;
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
 }
 
-.t-accent{
-    color:orange;
+.stat-label {
+    font-size: 1rem;
 }
 
-.bg-accent{
-    background-color: orange;
+/* Encabezado de la tabla */
+.table-custom thead th {
+    background-color: #1e1e1e;
+    /* Color de fondo de los encabezados */
+    color: #f1b24a;
+    /* Color de texto dorado */
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: left;
 }
 
-.bg-accent:hover{
-    background-color: rgb(231, 139, 0);
-}
-.bg-accent:hover:active{
-    background-color: rgb(231, 139, 0);
+/* Estilo de las celdas */
+.table-custom tbody td {
+    padding: 10px;
+    border-color: #1e1e1e;
+    background-color: #1e1e1e;
 }
 
-.icon{
-    height: 100%;
+/* Efecto hover para las filas */
+.table-custom tbody tr:hover {
+    background-color: #444;
+    /* Color de fondo al pasar el cursor */
+}
+
+.pagination {
+    justify-content: center;
+}
+
+.nav-menu {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.nav-menu a {
+    margin: 0 15px;
+    padding: 10px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+.nav-menu a:hover {
+    color: #f1b24a;
+    /* Efecto hover, color dorado */
+}
+
+.nav-menu a.active {
+    color: #f1b24a;
+    /* Color para el enlace activo */
+}
+
+/* Secciones de contenido */
+.section {
+    padding: 50px;
+    margin-top: 20px;
+    display: none;
+    /* Ocultar todas las secciones por defecto */
+}
+
+.section.active {
+    display: block;
+    /* Mostrar solo la sección activa */
 }
