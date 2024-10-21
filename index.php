@@ -614,6 +614,7 @@ if ($conn->connect_error) {
 
                 var filtros = {};
                 var fechas = {};
+                var categorias = {};
 
                 // Agregar filtros seleccionados al resumen
                 function actualizarResumen() {
@@ -653,6 +654,13 @@ if ($conn->connect_error) {
                     if (fechaFin) {
                         fechas["Fin"] = fechaFin;
                         actualizarFechas();
+                    }
+                });
+                $('#categoria').on('change', function() {
+                    var categoriaText = $('#categoria option:selected').text();
+                    if (categoriaText !== "Seleccione una Categoría") {
+                        filtros["Categoría"] = categoriaText;
+                        actualizarResumen();
                     }
                 });
                 // Cuando se selecciona un talent, se realiza una consulta AJAX para actualizar los datos
@@ -717,27 +725,40 @@ if ($conn->connect_error) {
                     e.preventDefault(); // Evitar el comportamiento predeterminado del formulario
 
                     var talentID = $('#talent').val();
-
+                    var fechaInicio = $('#fechaInicio').val();
+                    var fechaFin = $('#fechaFin').val();
+                    var categoria = $('#categoria').val();
+                    console.log(categoria)
                     if (talentID !== "0") { // Solo ejecutar si se selecciona un talent válido
-                        // Hacer la solicitud AJAX para ejecutar el query
+                        // Hacer la solicitud AJAX para ejecutar los dos queries
                         $.ajax({
-                            url: 'actualizar_estadisticas.php', // Archivo PHP que ejecutará el query
+                            url: 'actualizar_estadisticas.php', // Archivo PHP que ejecutará los queries
                             type: 'POST',
-                            dataType: 'json', // Esperamos recibir JSON en la respuesta
+                            dataType: 'json', // Esperamos recibir un JSON con ambas respuestas
                             data: {
-                                talent_id: talentID
+                                talent_id: talentID,
+                                fecha_inicio: fechaInicio,
+                                fecha_fin: fechaFin,
+                                categoria_id: categoria
+
                             },
                             success: function(response) {
-                                // Insertar los resultados de la búsqueda en los divs
-                                console.log(response);
-                                var totalHorasAlumnos = convertMinutesToHHMM(response.total_horas_alumnos);
-                                var duracionMediaSesion = convertMinutesToHHMM(response.duracion_media_sesion);
-                                var totalHorasTalent = convertMinutesToHHMM(response.total_horas_talent);
-                                $('#statSession').html(response.cantidad_sesiones);
-                                $('#statHrTotal').html(totalHorasAlumnos);
-                                $('#statDurMedia').html(duracionMediaSesion);
-                                $('#statHrTotalTalent').html(totalHorasTalent);
-                                $('#statAlumnosAtendidos').html(response.cantidad_alumnos_unicos);
+                                // Actualizar la tira de resultados con las estadísticas
+                                actualizarResultadosTira(response.estadisticas);
+                                console.log(response)
+                                // Insertar los resultados de la búsqueda en la tabla
+                                let html = '';
+                                response.asesorias.forEach(function(asesoria) {
+                                    html += '<tr>';
+                                    html += '<td>' + asesoria.asesoria_id + '</td>';
+                                    html += '<td>' + asesoria.Correo + '</td>';
+                                    html += '<td>' + asesoria.Fecha + '</td>';
+                                    html += '<td>' + asesoria.Duracion + '</td>';
+                                    html += '<td>' + asesoria.categoria + '</td>';
+                                    html += '<td>' + asesoria.asesor + '</td>';
+                                    html += '</tr>';
+                                });
+                                $('#resultados tbody').html(html);
                             },
                             error: function(jqXHR, textStatus, errorThrown) {
                                 console.log("Error: " + textStatus + " " + errorThrown);
@@ -747,6 +768,14 @@ if ($conn->connect_error) {
                         alert("Por favor, selecciona un Talent válido.");
                     }
                 });
+
+                function actualizarResultadosTira(data) {
+                    $('#statSession').text(data.cantidad_sesiones);
+                    $('#statHrTotal').text(convertMinutesToHHMM(data.total_horas_alumnos)); // Total Hrs Alumnos
+                    $('#statDurMedia').text(convertMinutesToHHMM(data.duracion_media_sesion)); // Duración media de sesión
+                    $('#statHrTotalTalent').text(convertMinutesToHHMM(data.total_horas_talent)); // Total Hrs Talent
+                    $('#statAlumnosAtendidos').text(data.cantidad_alumnos_unicos); // Profesores (Alumnos atendidos)
+                }
             });
             document.addEventListener("DOMContentLoaded", function() {
                 // Obtener todos los enlaces del menú y todas las secciones
