@@ -581,7 +581,7 @@ if ($conn->connect_error) {
                 filtersQuery["fechaFin"] = "";
             }
             if(filters["talent"].length > 0){
-                filtersQuery["talent"] = " AND asesor.ID IN ("+filters["talent"]+")";
+                filtersQuery["talent"] = " AND asesoria_asesor.id_Asesor IN ("+filters["talent"]+")";
             }else{
                 filtersQuery["talent"] = "";
             }
@@ -620,9 +620,9 @@ if ($conn->connect_error) {
 
 
             FROM categoria
-            LEFT JOIN asesoria ON categoria.ID = asesoria.id_Categoria`+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
-            LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
-            LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID`+filtersQuery["talent"]+`
+            INNER JOIN asesoria ON categoria.ID = asesoria.id_Categoria`+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
+            INNER JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria`+filtersQuery["talent"]+`
+            LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
             LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID
 
             GROUP BY Llave;`
@@ -679,7 +679,7 @@ if ($conn->connect_error) {
                 filtersQuery["fechaFin"] = "";
             }
             if(filters["talent"].length > 0){
-                filtersQuery["talent"] = " AND asesor.ID IN ("+filters["talent"]+")";
+                filtersQuery["talent"] = " AND asesoria_asesor.id_Asesor IN ("+filters["talent"]+")";
             }else{
                 filtersQuery["talent"] = "";
             }
@@ -718,12 +718,10 @@ if ($conn->connect_error) {
 
 
             FROM categoria
-            LEFT JOIN asesoria ON categoria.ID = asesoria.id_Categoria`+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
-            LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
-            LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID`+filtersQuery["talent"]+`
-            LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID
-
-            GROUP BY Llave;`
+            INNER JOIN asesoria ON categoria.ID = asesoria.id_Categoria`+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
+            INNER JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria`+filtersQuery["talent"]+`
+            LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
+            LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID;`
             console.log(query);
 
             $.ajax({
@@ -747,18 +745,12 @@ if ($conn->connect_error) {
                             let totalMinutesProfesoresMedia = 0;
                             let totalMinutesTalentHoras = 0;
                             for(let i = 0; i < response.length; i++){
-                                responseStats["Sesiones"] += parseFloat(response[i]["Sesiones"]);
-                                [hours, minutes] = response[i]["ProfesorHoras"].split(':');
-                                totalMinutesProfesorHoras = (hours * 60 + minutes);
-                                [hours, minutes] = response[i]["ProfesoresMedia"].split(':');
-                                totalMinutesProfesoresMedia = (hours * 60 + minutes);
-                                [hours, minutes] = response[i]["TalentHoras"].split(':');
-                                totalMinutesTalentHoras = (hours * 60 + minutes);
-                                responseStats["Profesores"] += parseFloat(response[i]["Profesores"]);
+                                responseStats["Sesiones"] = parseFloat(response[i]["Sesiones"]);
+                                responseStats["ProfesorHoras"] = response[i]["ProfesorHoras"];
+                                responseStats["ProfesoresMedia"] = response[i]["ProfesoresMedia"];
+                                responseStats["TalentHoras"] = response[i]["TalentHoras"];
+                                responseStats["Profesores"] = parseFloat(response[i]["Profesores"]);
                             }
-                            responseStats["ProfesorHoras"] = timeConversion(totalMinutesProfesorHoras);
-                            responseStats["ProfesoresMedia"] = timeConversion(totalMinutesProfesoresMedia);
-                            responseStats["TalentHoras"] = timeConversion(totalMinutesTalentHoras);
                         }
                         console.log(responseStats);
                         $('#statSession').html(responseStats["Sesiones"]);
@@ -801,12 +793,6 @@ if ($conn->connect_error) {
                     $('#filterList-'+category).append(element);
                     $('#'+category).val("0"); 
             });
-        }
-
-        function timeConversion(totalMinutes){
-            totalHours = Math.floor(totalMinutes / 60);
-            remainingMinutes = totalMinutes % 60;
-            return `${String(totalHours).padStart(2, '0')}:${String(remainingMinutes).padStart(2, '0')}`;
         }
 
         ResultadoTab();
