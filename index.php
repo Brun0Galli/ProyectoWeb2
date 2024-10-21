@@ -701,11 +701,17 @@ if ($conn->connect_error) {
                     $('#statSession').html('0');
                     $('#statHrTotal').html('00:00');
                     $('#statDurMedia').html('00:00');
-                    $('#statHrTotalTalent').html('00:00');
+                    $('#statHrTotalTalent').html('00:00 ');
                     $('#statAlumnosAtendidos').html('0');
 
                     // Actualizar el resumen visual
                 });
+
+                function convertMinutesToHHMM(minutes) {
+                    var hours = Math.floor(minutes / 60); // Obtener las horas
+                    var mins = Math.floor(minutes % 60); // Obtener los minutos restantes
+                    return hours + ':' + (mins < 10 ? '0' : '') + mins; // Formatear como hh:mm
+                }
                 $('#buscar').on('click', function(e) {
                     e.preventDefault(); // Evitar el comportamiento predeterminado del formulario
 
@@ -722,10 +728,14 @@ if ($conn->connect_error) {
                             },
                             success: function(response) {
                                 // Insertar los resultados de la búsqueda en los divs
+                                console.log(response);
+                                var totalHorasAlumnos = convertMinutesToHHMM(response.total_horas_alumnos);
+                                var duracionMediaSesion = convertMinutesToHHMM(response.duracion_media_sesion);
+                                var totalHorasTalent = convertMinutesToHHMM(response.total_horas_talent);
                                 $('#statSession').html(response.cantidad_sesiones);
-                                $('#statHrTotal').html(response.total_horas_alumnos);
-                                $('#statDurMedia').html(response.duracion_media_sesion);
-                                $('#statHrTotalTalent').html(response.total_horas_talent);
+                                $('#statHrTotal').html(totalHorasAlumnos);
+                                $('#statDurMedia').html(duracionMediaSesion);
+                                $('#statHrTotalTalent').html(totalHorasTalent);
                                 $('#statAlumnosAtendidos').html(response.cantidad_alumnos_unicos);
                             },
                             error: function(jqXHR, textStatus, errorThrown) {
