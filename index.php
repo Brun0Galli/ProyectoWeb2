@@ -381,31 +381,31 @@ if ($conn->connect_error) {
                 <div class="d-flex">
                     <div class="col m-auto">
                         <div class="stat-box">
-                            <div class="stat-number" id="statSession">164</div>
+                            <div class="stat-number" id="statSession"></div>
                             <div class="stat-label">Sesiones</div>
                         </div>
                     </div>
                     <div class="col m-auto">
                         <div class="stat-box">
-                            <div class="stat-number" id="statHrTotal">145:45</div>
+                            <div class="stat-number" id="statHrTotal"></div>
                             <div class="stat-label">Total Hrs. Profesor</div>
                         </div>
                     </div>
                     <div class="col m-auto">
                         <div class="stat-box">
-                            <div class="stat-number" id="statDurMedia">0:53</div>
+                            <div class="stat-number" id="statDurMedia"></div>
                             <div class="stat-label">Duración Media Sesión</div>
                         </div>
                     </div>
                     <div class="col m-auto">
                         <div class="stat-box">
-                            <div class="stat-number" id="statHrTotalTalent">147:15</div>
+                            <div class="stat-number" id="statHrTotalTalent"></div>
                             <div class="stat-label">Total Hrs. Talent</div>
                         </div>
                     </div>
                     <div class="col m-auto">
                         <div class="stat-box">
-                            <div class="stat-number" id="statAlumnosAtendidos">126</div>
+                            <div class="stat-number" id="statAlumnosAtendidos"></div>
                             <div class="stat-label">Profesores</div>
                         </div>
                     </div>
@@ -534,22 +534,22 @@ if ($conn->connect_error) {
                         <?php
                         // Query para obtener el resumen por categoría
                         $sql = "
-SELECT 
-    c.ID AS categoria_id,
-    c.Nombre AS categoria_nombre,
-    COUNT(DISTINCT a.ID) AS sesiones,
-    COUNT(DISTINCT a.Correo) AS profesores,
-    SUM(a.Duracion) AS total_horas_prof,
-    SUM(a.Duracion) AS total_horas_talent, -- Esto puede cambiar si manejas horas de talent de otra manera
-    AVG(a.Duracion) AS duracion_media_prof,
-    AVG(a.Duracion) AS duracion_media_talent -- Asumiendo que las horas de talent son iguales a las de profesor
-FROM asesoria a
-JOIN categoria c ON a.id_Categoria = c.ID
-JOIN asesoria_asesor aa ON a.ID = aa.id_Asesoria
-JOIN asesor ase ON aa.id_Asesor = ase.ID
-GROUP BY c.ID, c.Nombre
-ORDER BY c.Nombre;
-";
+                            SELECT 
+                                c.ID AS categoria_id,
+                                c.Nombre AS categoria_nombre,
+                                COUNT(DISTINCT a.ID) AS sesiones,
+                                COUNT(DISTINCT a.Correo) AS profesores,
+                                SUM(a.Duracion) AS total_horas_prof,
+                                SUM(a.Duracion) AS total_horas_talent, -- Esto puede cambiar si manejas horas de talent de otra manera
+                                AVG(a.Duracion) AS duracion_media_prof,
+                                AVG(a.Duracion) AS duracion_media_talent -- Asumiendo que las horas de talent son iguales a las de profesor
+                            FROM asesoria a
+                            JOIN categoria c ON a.id_Categoria = c.ID
+                            JOIN asesoria_asesor aa ON a.ID = aa.id_Asesoria
+                            JOIN asesor ase ON aa.id_Asesor = ase.ID
+                            GROUP BY c.ID, c.Nombre
+                            ORDER BY c.Nombre;
+                            ";
                         $result = $conn->query($sql);
 
                         if ($result->num_rows > 0) {
@@ -654,6 +654,7 @@ ORDER BY c.Nombre;
                         actualizarFechas();
                     }
                 });
+                // Cuando se selecciona un talent, se realiza una consulta AJAX para actualizar los datos
 
                 // Inicializar el calendario
                 $('#calendarioInicio').on('click', function() {
@@ -690,16 +691,50 @@ ORDER BY c.Nombre;
                     });
                 });
 
-                // Buscar
-
                 // Limpiar
                 $('#limpiarCampos').on('click', function() {
                     $('#filterForm')[0].reset(); // Limpiar los campos del formulario
                     filtros = {};
                     fechas = {}; // Vaciar el objeto de filtros
                     actualizarResumen();
-                    actualizarFechas(); // Actualizar el resumen visual
-                    $('#resultados').empty();
+                    actualizarFechas();
+                    $('#statSession').html('0');
+                    $('#statHrTotal').html('00:00');
+                    $('#statDurMedia').html('00:00');
+                    $('#statHrTotalTalent').html('00:00');
+                    $('#statAlumnosAtendidos').html('0');
+
+                    // Actualizar el resumen visual
+                });
+                $('#buscar').on('click', function(e) {
+                    e.preventDefault(); // Evitar el comportamiento predeterminado del formulario
+
+                    var talentID = $('#talent').val();
+
+                    if (talentID !== "0") { // Solo ejecutar si se selecciona un talent válido
+                        // Hacer la solicitud AJAX para ejecutar el query
+                        $.ajax({
+                            url: 'actualizar_estadisticas.php', // Archivo PHP que ejecutará el query
+                            type: 'POST',
+                            dataType: 'json', // Esperamos recibir JSON en la respuesta
+                            data: {
+                                talent_id: talentID
+                            },
+                            success: function(response) {
+                                // Insertar los resultados de la búsqueda en los divs
+                                $('#statSession').html(response.cantidad_sesiones);
+                                $('#statHrTotal').html(response.total_horas_alumnos);
+                                $('#statDurMedia').html(response.duracion_media_sesion);
+                                $('#statHrTotalTalent').html(response.total_horas_talent);
+                                $('#statAlumnosAtendidos').html(response.cantidad_alumnos_unicos);
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                console.log("Error: " + textStatus + " " + errorThrown);
+                            }
+                        });
+                    } else {
+                        alert("Por favor, selecciona un Talent válido.");
+                    }
                 });
             });
             document.addEventListener("DOMContentLoaded", function() {
