@@ -7,9 +7,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
-}
-
-?>
+} ?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -20,12 +18,143 @@ if ($conn->connect_error) {
     <title>Asesorías Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <link href="style.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #fff;
+        }
+
+        .input-group {
+            width: auto;
+        }
+
+        .input-group-text-custom {
+            background-color: #333;
+            color: #807834;
+            border-radius: 20px 0 0 20px;
+            border: none;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .filters-summary {
+            width: auto;
+            background-color: #333;
+            color: white;
+            border-radius: 20px;
+            border: none;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .form-select-custom {
+            background-color: #333;
+            color: #6c757d;
+            border: none;
+            border-radius: 20px;
+        }
+
+        .input-custom {
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 20px;
+        }
+
+        .btn-custom {
+        background-color: #6c757d; /* Color del botón */
+        border: none; /* Sin borde */
+        border-radius: 10px; /* Bordes redondeados */
+        padding: 0.375rem 0.75rem; /* Espaciado */
+        color: white;
+        }
+        .btn-custom:hover {
+        background-color: #52595f;
+        }
+        .btn-custom:hover:active {
+        background-color: #52595f;
+        }
+        .btn-custom2 {
+        background-color: #635e29; /* Color del botón */
+        border: none; /* Sin borde */
+        border-radius: 10px; /* Bordes redondeados */
+        padding: 0.375rem 0.75rem; /* Espaciado */
+        color: white;
+        }
+        .btn-custom2:hover {
+        background-color: #5a5418; /* Color del botón */
+        }
+        .btn-custom2:hover:active {
+        background-color: #5a5418; /* Color del botón */
+        }
+        .btn-filter {
+        background-color: #6c757d; /* Color del botón */
+        border: none; /* Sin borde */
+        padding: 0.2rem 0.75rem; /* Espaciado */
+        color: white;
+        }
+
+        .btn-custom i {
+            font-size: 1.2rem;
+        }
+
+        .daterangepicker {
+            background-color: #333;
+            /* Fondo oscuro */
+            color: white;
+            /* Texto blanco */
+        }
+
+        .daterangepicker .calendar-table {
+            color: #807834;
+        }
+
+        .daterangepicker td.active,
+        .daterangepicker td.active:hover {
+            background-color: #635e29;
+            /* Color del fondo activo */
+            color: white;
+        }
+
+        .daterangepicker td.start-date,
+        .daterangepicker td.end-date {
+            background-color: #635e29;
+            color: white;
+        }
+
+        .daterangepicker td.available:hover {
+            background-color: #6c757d;
+            /* Color del hover */
+            color: white;
+        }
+
+        .daterangepicker .applyBtn,
+        .daterangepicker .cancelBtn {
+            background-color: #635e29;
+            /* Botones aplicar/cancelar */
+            border: none;
+        }
+
+        .daterangepicker .applyBtn:hover,
+        .daterangepicker .cancelBtn:hover {
+            background-color: #6c757d;
+        }
+
+        .nav-link{
+            color:white;
+        }
+        .nav-link:hover{
+            color:#807834;
+        }
+        .nav-link.active{
+            color:#807834;
+        }
+    </style>
 </head>
 
 <body>
@@ -44,24 +173,24 @@ if ($conn->connect_error) {
                 <div class="row m-auto mt-3">
                     <div class="col-md-10">
                         <div class="d-flex align-items-center">
-                            <div class="input-group" style="max-width: 400px;">
+                            <div class="input-group flex-wrap" style="max-width: 400px;">
                                 <span class="input-group-text input-group-text-custom">Inicio:</span>
-                                <input type="text" class="input-custom me-2" id="fechaInicio">
+                                <input type="text form-control" class="input-custom me-2" id="fechaInicio">
                             </div>
                             <button class="btn btn-custom mx-2" type="button" id="calendarioInicio">
                                 <i class="bi bi-calendar-x-fill"></i>
                             </button>
-                            <div class="input-group" style="max-width: 400px;">
+                            <div class="input-group flex-wrap" style="max-width: 400px;">
                                 <span class="input-group-text input-group-text-custom ms-2">Fin:</span>
-                                <input type="text" class="input-custom me-2" id="fechaFin">
+                                <input type="text form-control" class="input-custom me-2" id="fechaFin">
                             </div>
                             <button class="btn btn-custom mx-2" type="button" id="calendarioFin">
                                 <i class="bi bi-calendar-x-fill"></i>
                             </button>
-                            <div class="input-group" style="max-width: 400px;">
+                            <div class="input-group flex-wrap" style="max-width: 300px; width:100%;">
                                 <span class="input-group-text input-group-text-custom ms-2">Talent:</span>
-                                <select class="form-select form-select-custom" id="talent">
-                                    <option selected>Seleccione un miembro</option>
+                                <select class="form-select form-select-custom form-control" id="talent">
+                                    <option selected value="0">Seleccione un miembro</option>
                                     <!-- Aquí cargarás los profesores desde la base de datos -->
                                     <?php
                                     $query = "select * from asesor";
@@ -87,20 +216,21 @@ if ($conn->connect_error) {
                 <div class="row m-auto mt-3">
                     <div class="col-md-10">
                         <div class="d-flex">
-                            <div class="input-group" style="max-width: 400px;">
+                            <div class="input-group flex-wrap" style="max-width: 400px; width:100%">
                                 <span class="input-group-text input-group-text-custom">Sede:</span>
-                                <select class="form-select form-select-custom" id="sede">
-                                    <option selected>Todas las sedes</option>
-                                    <option value="1">CDMX</option>
-                                    <option value="2">AGS</option>
-                                    <option value="3">GDL</option>
-                                    <option value="5">CUP</option>
+                                <select class="form-select form-select-custom form-control" id="sede">
+                                    <option selected value="0">Todas las sedes</option>
+                                    <option value="1">Mexico</option>
+                                    <option value="4">Aguascalientes</option>
+                                    <option value="5">Guadalajara</option>
+                                    <option value="6">Ciudad UP</option>
+                                    <option value="1007">Sin Sede</option>
                                 </select>
                             </div>
-                            <div class="input-group ms-4" style="max-width: 400px;">
+                            <div class="input-group ms-4 flex-wrap" style="max-width: 400px; width:100%;">
                                 <span class="input-group-text input-group-text-custom">Categorías:</span>
-                                <select class="form-select form-select-custom" id="categoria">
-                                    <option selected>Seleccione una Categoría</option>
+                                <select class="form-select form-select-custom form-control" id="categoria">
+                                    <option selected value="0">Seleccione una Categoría</option>
                                     <?php
                                     $query = "select * from categoria";
                                     $result = $conn->query($query);
@@ -124,264 +254,277 @@ if ($conn->connect_error) {
                 </div>
             </div>
         </form>
-        <div class="resumen-filtros" id="resumenFiltros">
-            <div class="row">
-                <div class=" col-md-2">
-                    <div class="row m-auto">
-                        Intervalo de Fechas:
-                    </div>
-                    <div class="row m-auto mt-3">
-                        Miembro Talent:
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="row m-auto">
-                        <div id="fechasSeleccionadas">
 
-                        </div>
-                    </div>
-                    <div class="row m-auto mt-4">
-                        <div id="filtrosSeleccionados">
-                            <!-- Aquí se mostrarán los filtros seleccionados -->
-                        </div>
-                    </div>
+        <!-- Filtros activados -->
+        <div class="row my-3 filters-summary">
+            <div class="d-flex flex-row row m-auto mt-3">
+                <div class="col-md-2">
+                    Intervalo de Fechas
+                </div>
+                <div class="col-md-5" id="filterList-Fecha">
+                    <button class="btn-filter "><span>FilterList</span><i class="bi bi-trash ms-3"></i></button>
+                </div>
+            </div>
+            <div class="row m-auto mt-3" id="filterContainer-Talent">
+                <div class="col-md-10">
+                    Miembro Talent
+                </div>
+                <div class="col-md-10" id="filterList-Talent">
+                    
                 </div>
             </div>
         </div>
 
-        <div class="resultados-tira" id="resultadosTira">
-            <div class="row m-auto">
-                <div class="d-flex">
-                    <div class="col m-auto">
-                        <div class="stat-box">
-                            <div class="stat-number" id="statSession">164</div>
-                            <div class="stat-label">Sesiones</div>
-                        </div>
-                    </div>
-                    <div class="col m-auto">
-                        <div class="stat-box">
-                            <div class="stat-number" id="statHrTotal">145:45</div>
-                            <div class="stat-label">Total Hrs. Profesor</div>
-                        </div>
-                    </div>
-                    <div class="col m-auto">
-                        <div class="stat-box">
-                            <div class="stat-number" id="statDurMedia">0:53</div>
-                            <div class="stat-label">Duración Media Sesión</div>
-                        </div>
-                    </div>
-                    <div class="col m-auto">
-                        <div class="stat-box">
-                            <div class="stat-number" id="statHrTotalTalent">147:15</div>
-                            <div class="stat-label">Total Hrs. Talent</div>
-                        </div>
-                    </div>
-                    <div class="col m-auto">
-                        <div class="stat-box">
-                            <div class="stat-number" id="statAlumnosAtendidos">126</div>
-                            <div class="stat-label">Profesores</div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Tab headers -->
+        <div class="my-3">
+            <!-- Nav tabs -->
+            <ul class="nav" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="resultados-tab" data-bs-toggle="tab" href="#resultados" role="tab">Resultados</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="categorias-tab" data-bs-toggle="tab" href="#categorias" role="tab">Categorias</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="asesores-tab" data-bs-toggle="tab" href="#asesores" role="tab">Asesores</a>
+            </li>
+        </ul>
+
+        <!-- Tab content -->
+        <div class="tab-content my-2" id="myTabContent">
+            <div class="tab-pane show active" id="resultados" role="tabpanel">
+                <table class="table table-striped table-dark" id="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</td>
+                            <th scope="col">Correo</td>
+                            <th scope="col">Fecha</td>
+                            <th scope="col">Duracion</td>
+                            <th scope="col">Categoria</td>
+                            <th scope="col">Asesor</td>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyResultados">
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="categorias" role="tabpanel">
+                <table class="table table-striped table-dark" id="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Key</td>
+                            <th scope="col">Nombre</td>
+                            <th scope="col">Sesiones</td>
+                            <th scope="col">Profesores</td>
+                            <th scope="col">Total Horas Prof</td>
+                            <th scope="col">Total Horas TALENT</td>
+                            <th scope="col">Duracion Media Prof</td>
+                            <th scope="col">Duracion Media TALENT</td>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyCategorias">
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="asesores" role="tabpanel">
+                <h3>WIP</h3>
             </div>
         </div>
-
-        <div class="container mt-5">
-            <nav class="nav-menu">
-                <a href="#resultados" id="link-resultados" class="active">Resultados</a>
-                <a href="#categorias" id="link-categorias">Categorías</a>
-                <a href="#asesores" id="link-asesores">Asesores</a>
-            </nav>
-
-            <div id="resultados" class="section active">
-                <table class="table table-hover table-dark table-custom">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Correo</th>
-                            <th>Fecha</th>
-                            <th>Duración</th>
-                            <th>Categoría</th>
-                            <th>Asesor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        function convertirMinutos($minutos)
-                        {
-                            $horas = floor($minutos / 60);  // Horas completas
-                            $minutosRestantes = round((float) $minutos) % 60;  // Minutos restantes
-                            return sprintf("%02d:%02d", $horas, $minutosRestantes);  // Formato hh:mm
-                        }
-                        $results_per_page = 50;
-
-                        // Obtener el número total de registros
-                        $total_results_sql = "SELECT COUNT(*) AS total FROM asesoria";
-                        $total_results_result = $conn->query($total_results_sql);
-                        $total_row = $total_results_result->fetch_assoc();
-                        $total_results = $total_row['total'];
-
-                        // Calcular el número total de páginas
-                        $total_pages = ceil($total_results / $results_per_page);
-
-                        // Obtener el número de página actual desde la URL, si no está definido, será la página 1
-                        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-
-                        // Calcular el OFFSET para la consulta SQL
-                        $start_from = ($page - 1) * $results_per_page;
-
-                        // Consulta SQL con paginación
-                        $sql = "SELECT a.ID AS asesoria_id, a.Correo, a.Fecha, a.Duracion, c.Nombre AS categoria, ase.Nombre AS asesor 
-                        FROM asesoria a 
-                        JOIN categoria c ON a.id_Categoria = c.ID 
-                        JOIN asesoria_asesor aa ON a.ID = aa.id_Asesoria 
-                        JOIN asesor ase ON aa.id_Asesor = ase.ID 
-                        ORDER BY a.Fecha DESC 
-                        LIMIT $results_per_page OFFSET $start_from";
-
-                        $result = $conn->query($sql);
-
-                        if (!$result) {
-                            die("Query error: " . $conn->error);
-                        }
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                echo "<tr>";
-                                echo "<td>" . $row["asesoria_id"] . "</td>";
-                                echo "<td>" . $row["Correo"] . "</td>";
-                                echo "<td>" . date("d-m-Y H:i:s", strtotime($row["Fecha"])) . "</td>";
-                                echo "<td>" . convertirMinutos($row["Duracion"]) . "</td>";
-                                echo "<td>" . $row["categoria"] . "</td>";
-                                echo "<td>" . $row["asesor"] . "</td>";
-                                echo "</tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='6'>No se encontraron resultados</td></tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-
-                <!-- Navegación de paginación -->
-                <nav>
-                    <ul class="pagination">
-                        <?php
-                        // Botón "anterior"
-                        if ($page > 1) {
-                            echo "<li class='page-item'><a class='page-link' href='?page=" . ($page - 1) . "'>Anterior</a></li>";
-                        }
-
-                        // Botones de números de página
-                        for ($i = 1; $i <= $total_pages; $i++) {
-                            if ($i == $page) {
-                                echo "<li class='page-item active'><a class='page-link' href='?page=$i'>$i</a></li>";
-                            } else {
-                                echo "<li class='page-item'><a class='page-link' href='?page=$i'>$i</a></li>";
-                            }
-                        }
-
-                        // Botón "siguiente"
-                        if ($page < $total_pages) {
-                            echo "<li class='page-item'><a class='page-link' href='?page=" . ($page + 1) . "'>Siguiente</a></li>";
-                        }
-                        ?>
-                    </ul>
-                </nav>
-            </div>
-            <div id="categorias" class="section">
-                <h2>Categorías</h2>
-                <table class="table table-hover table-dark table-custom">
-                    <thead>
-                        <tr>
-                            <th>Key</th>
-                            <th>Nombre</th>
-                            <th>Sesiones</th>
-                            <th>Profesores</th>
-                            <th>Total Horas Prof</th>
-                            <th>Total Horas Talent</th>
-                            <th>Duración Media Prof</th>
-                            <th>Duración Media Talent</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // Query para obtener el resumen por categoría
-                        $sql = "
-                        SELECT 
-                            c.ID AS categoria_id,
-                            c.Nombre AS categoria_nombre,
-                            COUNT(DISTINCT a.ID) AS sesiones,
-                            COUNT(DISTINCT a.Correo) AS profesores,
-                            SUM(a.Duracion) AS total_horas_prof,
-                            SUM(a.Duracion) AS total_horas_talent, -- Esto puede cambiar si manejas horas de talent de otra manera
-                            AVG(a.Duracion) AS duracion_media_prof,
-                            AVG(a.Duracion) AS duracion_media_talent -- Asumiendo que las horas de talent son iguales a las de profesor
-                        FROM asesoria a
-                        JOIN categoria c ON a.id_Categoria = c.ID
-                        JOIN asesoria_asesor aa ON a.ID = aa.id_Asesoria
-                        JOIN asesor ase ON aa.id_Asesor = ase.ID
-                        GROUP BY c.ID, c.Nombre
-                        ORDER BY c.Nombre;
-                        ";
-                        $result = $conn->query($sql);
-
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                echo "<tr>";
-                                echo "<td>" . $row["categoria_id"] . "</td>";
-                                echo "<td>" . $row["categoria_nombre"] . "</td>";
-                                echo "<td>" . $row["sesiones"] . "</td>";
-                                echo "<td>" . $row["profesores"] . "</td>";
-                                echo "<td>" . convertirMinutos($row["total_horas_prof"]) . "</td>";  // Convertir minutos a hh:mm
-                                echo "<td>" . convertirMinutos($row["total_horas_talent"]) . "</td>";  // Convertir minutos a hh:mm
-                                echo "<td>" . convertirMinutos($row["duracion_media_prof"]) . "</td>";  // Convertir minutos a hh:mm
-                                echo "<td>" . convertirMinutos($row["duracion_media_talent"]) . "</td>";  // Convertir minutos a hh:mm
-                                echo "</tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='8'>No se encontraron resultados</td></tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-            <div id="asesores" class="section">
-                <h2>Asesores</h2>
-                <table class="table table-hover table-dark table-custom">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Correo</th>
-                            <th>Especialidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // Query para obtener la información de los asesores
-                        $sql = "SELECT ase.ID, ase.Nombre, ase.Correo, 'Especialidad' AS especialidad FROM asesor ase";
-                        $result = $conn->query($sql);
-
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                echo "<tr>";
-                                echo "<td>" . $row["ID"] . "</td>";
-                                echo "<td>" . $row["Nombre"] . "</td>";
-                                echo "<td>" . $row["Correo"] . "</td>";
-                                echo "<td>" . $row["especialidad"] . "</td>";
-                                echo "</tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='4'>No se encontraron asesores</td></tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-
         </div>
-        <!-- Scripts -->
-        <script src="script.js"></script>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        $(document).ready(function() {
+            // Inicializar el calendario
+            $('#calendarioInicio').on('click', function() {
+                $('#fechaInicio').daterangepicker({
+                    singleDatePicker: true,
+                    timePicker: true,
+                    timePicker24Hour: true,
+                    showDropdowns: true, // Agregar dropdowns para seleccionar el año y el mes
+                    locale: {
+                        format: 'YYYY-MM-DD HH:mm',
+                        applyLabel: "Aplicar",
+                        cancelLabel: "Cancelar",
+                        daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
+                        monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+                        firstDay: 1 // Comienza la semana en lunes
+                    }
+                });
+            });
+
+            $('#calendarioFin').on('click', function() {
+                $('#fechaFin').daterangepicker({
+                    singleDatePicker: true,
+                    timePicker: true,
+                    timePicker24Hour: true,
+                    showDropdowns: true, // Agregar dropdowns para seleccionar el año y el mes
+                    locale: {
+                        format: 'YYYY-MM-DD HH:mm',
+                        applyLabel: "Aplicar",
+                        cancelLabel: "Cancelar",
+                        daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
+                        monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+                        firstDay: 1 // Comienza la semana en lunes
+                    }
+                });
+            });
+
+            // Buscar
+            $('#buscar').on('click', function(e) {
+                e.preventDefault();
+                $("#tableBodyResultados").html("");
+                $("#tableBodyCategorias").html("");
+                ResultadoTab();
+                CategoriasTab();
+            });
+
+            // Limpiar
+            $('#limpiarCampos').on('click', function() {
+                $('#filterForm')[0].reset(); // Resetea el formulario
+            });
+
+            //Filtros
+            //Fecha
+            var fechaInicioChangeToggle = false;
+            $('#fechaInicio').on("change keyup paste",function () {
+                console.log(fechaInicioChangeToggle);
+                if(fechaInicioChangeToggle){
+                    $('#filterList-Fecha').append('<button class="btn-filter" onclick="deleteSelfFilter()"><span>'+$('#fechaInicio').val()+'</span><i class="bi bi-trash ms-3"></i></button>');
+                    $('#fechaInicio').val(""); 
+                }
+                fechaInicioChangeToggle = !fechaInicioChangeToggle;
+            });
+            $('#talent').on("change keyup paste",function () {
+                    $("#filterContainer-Talent").show();
+                    let element = '<button class="btn-filter me-3" onclick="deleteSelfFilter(this)"><span value="'+
+                    $('#talent').val()+'">'+
+                    $('#talent option:selected').text()+
+                    '</span><i class="bi bi-trash ms-3"></i></button>';
+                    $('#filterList-Talent').append(element);
+                    $('#talent').val(""); 
+            });
+        });
+        function ResultadoTab(){
+            filters = getFilters();
+            let query = "SELECT asesoria.ID, asesoria.Correo AS Correo, " +
+            "asesoria.Fecha, asesoria.duracion AS Duracion, " +
+            "categoria.Llave AS Categoria, asesor.nombre AS Asesor " +
+            "FROM asesor " +
+            "INNER JOIN asesoria_asesor ON asesor.ID = asesoria_asesor.id_Asesor " +
+            "INNER JOIN asesoria ON asesoria_asesor.id_Asesoria = asesoria.ID " +
+            "INNER JOIN categoria ON categoria.ID = asesoria.id_Categoria " +
+            "WHERE 1=1" + filters + " " +
+            "ORDER BY asesoria.Fecha DESC;";
+            console.log(query);
+
+            $.ajax({
+                    url: 'components/buscar.php',
+                    method: 'POST',
+                    data: {
+                        query: query
+                    },
+                    success: function(response) {
+                        //console.log(response);
+                        if (response != "0"){
+                            response = JSON.parse(response);
+                            for(let i = 0; i < response.length; i++){
+                                //console.log(response[i]);
+                                let element = "<tr>"+
+                                "<td>"+response[i]["ID"]+"</td>"+
+                                "<td>"+response[i]["Correo"]+"</td>"+
+                                "<td>"+response[i]["Fecha"]+"</td>"+
+                                "<td>"+response[i]["Duracion"]+"</td>"+
+                                "<td>"+response[i]["Categoria"]+"</td>"+
+                                "<td>"+response[i]["Asesor"]+"</td>"+
+                                "</tr>";
+                                // console.log(element);
+                                $("#tableBodyResultados").append(element);
+                            }
+                        }
+                    }
+            });
+        }
+
+        function CategoriasTab(){
+            filters = getFilters();
+            let query = "WITH UniqueAsesores AS ( SELECT asesoria.id_Categoria, asesoria.ID, SUM(Duracion) AS Unique_Durations, COUNT(DISTINCT asesor.ID) AS Unique_Count FROM asesoria LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID GROUP BY asesoria.ID ) SELECT Llave AS 'Key', categoria.Nombre, COUNT(asesoria.id_Categoria) AS Sesiones, COUNT(DISTINCT asesoria.Correo) AS Profesores, TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60, 0)), '%H:%i') AS ProfesorHoras, TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60, 0)), '%H:%i') AS TalentHoras, TIME_FORMAT( SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), '%H:%i' ) AS ProfesoresMedia, TIME_FORMAT( SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), '%H:%i' ) AS TalentMedia FROM categoria LEFT JOIN asesoria ON categoria.ID = asesoria.id_Categoria LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID GROUP BY Llave;";
+            console.log(query);
+
+            $.ajax({
+                    url: 'components/buscar.php',
+                    method: 'POST',
+                    data: {
+                        query: query
+                    },
+                    success: function(response) {
+                        //console.log(response);
+                        if (response != "0"){
+                            response = JSON.parse(response);
+                            for(let i = 0; i < response.length; i++){
+                                //console.log(response[i]);
+                                let element = "<tr>"+
+                                "<td>"+response[i]["Key"]+"</td>"+
+                                "<td>"+response[i]["Nombre"]+"</td>"+
+                                "<td>"+response[i]["Sesiones"]+"</td>"+
+                                "<td>"+response[i]["Profesores"]+"</td>"+
+                                "<td>"+response[i]["ProfesorHoras"]+"</td>"+
+                                "<td>"+response[i]["TalentHoras"]+"</td>"+
+                                "<td>"+response[i]["ProfesoresMedia"]+"</td>"+
+                                "<td>"+response[i]["TalentMedia"]+"</td>"+
+                                "</tr>";
+                                // console.log(element);
+                                $("#tableBodyCategorias").append(element);
+                            }
+                        }
+                    }
+            });
+        }
+
+        function getFilters(){
+            var sede = $('#sede').val();
+            var inicio = $('#fechaInicio').val();
+            var fin = $('#fechaFin').val();
+            var talent = $('#talent').val();
+            var categoria = $('#categoria').val();
+
+            sede = sede ? sede : '';
+            inicio = inicio ? inicio : '';
+            fin = fin ? fin : '';
+            talent = talent ? talent : '';
+            categoria = categoria ? categoria : '';
+
+            let filters = "";
+
+            if(sede != "0"){
+                filters += " AND asesoria.id_Sede = "+sede;
+            }
+            if(inicio != ""){
+                filters += " AND asesoria.Fecha >= '"+inicio+"'";
+            }
+            if(fin != ""){
+                filters += " AND asesoria.Fecha <= '"+fin+"'";
+            }
+            if(talent != "0"){
+                filters += " AND asesor.ID = "+talent;
+            }
+            if(categoria != "0"){
+                filters += " AND categoria.ID = "+categoria;
+            }
+            return filters;
+        }
+
+        function deleteSelfFilter(button){
+            if($(button).parent().children().length <= 1){
+                $(button).parent().parent().hide();
+            }
+            $(button).remove();
+        }
+
+        ResultadoTab();
+        CategoriasTab();
+    </script>
 </body>
 
 </html>
