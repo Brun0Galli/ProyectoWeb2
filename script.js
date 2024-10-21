@@ -5,11 +5,11 @@ $(document).ready(function() {
     var fechas = {};
     var categorias = {};
 
-    // Agregar filtros seleccionados al resumen
+   
     function actualizarResumen() {
         var resumen = $("#filtrosSeleccionados");
 
-        resumen.empty(); // Limpiar el resumen visual
+        resumen.empty(); 
         $.each(filtros, function(clave, valor) {
             resumen.append('<span class="filtro-tag">' + clave + ': ' + valor + '</span>');
         });
@@ -52,7 +52,7 @@ $(document).ready(function() {
             actualizarResumen();
         }
     });
-    // Cuando se selecciona un talent, se realiza una consulta AJAX para actualizar los datos
+    
 
     // Inicializar el calendario
     $('#calendarioInicio').on('click', function() {
@@ -60,14 +60,14 @@ $(document).ready(function() {
             singleDatePicker: true,
             timePicker: true,
             timePicker24Hour: true,
-            showDropdowns: true, // Agregar dropdowns para seleccionar el año y el mes
+            showDropdowns: true, 
             locale: {
                 format: 'YYYY-MM-DD HH:mm',
                 applyLabel: "Aplicar",
                 cancelLabel: "Cancelar",
                 daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
                 monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-                firstDay: 1 // Comienza la semana en lunes
+                firstDay: 1 
             }
         });
     });
@@ -77,14 +77,14 @@ $(document).ready(function() {
             singleDatePicker: true,
             timePicker: true,
             timePicker24Hour: true,
-            showDropdowns: true, // Agregar dropdowns para seleccionar el año y el mes
+            showDropdowns: true, 
             locale: {
                 format: 'YYYY-MM-DD HH:mm',
                 applyLabel: "Aplicar",
                 cancelLabel: "Cancelar",
                 daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
                 monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-                firstDay: 1 // Comienza la semana en lunes
+                firstDay: 1
             }
         });
     });
@@ -93,7 +93,7 @@ $(document).ready(function() {
     $('#limpiarCampos').on('click', function() {
         $('#filterForm')[0].reset(); // Limpiar los campos del formulario
         filtros = {};
-        fechas = {}; // Vaciar el objeto de filtros
+        fechas = {}; // Vaciar el objeto de fechas y filtross
         actualizarResumen();
         actualizarFechas();
         $('#statSession').html('0');
@@ -102,28 +102,26 @@ $(document).ready(function() {
         $('#statHrTotalTalent').html('00:00 ');
         $('#statAlumnosAtendidos').html('0');
 
-        // Actualizar el resumen visual
     });
 
     function convertMinutesToHHMM(minutes) {
-        var hours = Math.floor(minutes / 60); // Obtener las horas
-        var mins = Math.floor(minutes % 60); // Obtener los minutos restantes
-        return hours + ':' + (mins < 10 ? '0' : '') + mins; // Formatear como hh:mm
+        var hours = Math.floor(minutes / 60); 
+        var mins = Math.floor(minutes % 60); 
+        return hours + ':' + (mins < 10 ? '0' : '') + mins; 
     }
     $('#buscar').on('click', function(e) {
-        e.preventDefault(); // Evitar el comportamiento predeterminado del formulario
+        e.preventDefault(); 
 
         var talentID = $('#talent').val();
         var fechaInicio = $('#fechaInicio').val();
         var fechaFin = $('#fechaFin').val();
         var categoria = $('#categoria').val();
         console.log(categoria)
-        if (talentID !== "0") { // Solo ejecutar si se selecciona un talent válido
-            // Hacer la solicitud AJAX para ejecutar los dos queries
+        if (talentID !== "0") { 
             $.ajax({
                 url: 'actualizar_estadisticas.php', // Archivo PHP que ejecutará los queries
                 type: 'POST',
-                dataType: 'json', // Esperamos recibir un JSON con ambas respuestas
+                dataType: 'json', 
                 data: {
                     talent_id: talentID,
                     fecha_inicio: fechaInicio,
@@ -132,10 +130,10 @@ $(document).ready(function() {
 
                 },
                 success: function(response) {
-                    // Actualizar la tira de resultados con las estadísticas
+                    
                     actualizarResultadosTira(response.estadisticas);
                     console.log(response)
-                    // Insertar los resultados de la búsqueda en la tabla
+                    
                     let html = '';
                     response.asesorias.forEach(function(asesoria) {
                         html += '<tr>';
@@ -160,10 +158,10 @@ $(document).ready(function() {
 
     function actualizarResultadosTira(data) {
         $('#statSession').text(data.cantidad_sesiones);
-        $('#statHrTotal').text(convertMinutesToHHMM(data.total_horas_alumnos)); // Total Hrs Alumnos
-        $('#statDurMedia').text(convertMinutesToHHMM(data.duracion_media_sesion)); // Duración media de sesión
-        $('#statHrTotalTalent').text(convertMinutesToHHMM(data.total_horas_talent)); // Total Hrs Talent
-        $('#statAlumnosAtendidos').text(data.cantidad_alumnos_unicos); // Profesores (Alumnos atendidos)
+        $('#statHrTotal').text(convertMinutesToHHMM(data.total_horas_alumnos)); 
+        $('#statDurMedia').text(convertMinutesToHHMM(data.duracion_media_sesion)); 
+        $('#statHrTotalTalent').text(convertMinutesToHHMM(data.total_horas_talent)); 
+        $('#statAlumnosAtendidos').text(data.cantidad_alumnos_unicos); 
     }
 });
 document.addEventListener("DOMContentLoaded", function() {
@@ -173,17 +171,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Función para cambiar de sección
     function showSection(hash) {
-        // Ocultar todas las secciones
+   
         sections.forEach(section => {
             section.classList.remove("active");
         });
 
-        // Remover clase "active" de todos los enlaces
+        
         links.forEach(link => {
             link.classList.remove("active");
         });
 
-        // Mostrar la sección correcta y resaltar el enlace activo
+        
         document.querySelector(hash).classList.add("active");
         document.querySelector(`a[href='${hash}']`).classList.add("active");
     }
@@ -192,13 +190,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const currentHash = window.location.hash || "#resultados";
     showSection(currentHash);
 
-    // Añadir evento click a cada enlace
+    
     links.forEach(link => {
         link.addEventListener("click", function(event) {
-            event.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
+            event.preventDefault(); 
             const hash = this.getAttribute("href");
-            window.location.hash = hash; // Cambiar la URL
-            showSection(hash); // Mostrar la sección correspondiente
+            window.location.hash = hash; 
+            showSection(hash); 
         });
     });
 });
