@@ -31,6 +31,33 @@ if ($conn->connect_error) {
             color: #fff;
         }
 
+        .resultados-tira {
+            background-color: #dbb90f;
+            padding: 10px;
+            border-radius: 20px;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 70%;
+        }
+
+        .stat-box {
+            /* Color dorado */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+        }
+
         .input-group {
             width: auto;
         }
@@ -255,6 +282,43 @@ if ($conn->connect_error) {
             </div>
         </form>
 
+        <div class="resultados-tira" id="resultadosTira">
+            <div class="row m-auto">
+                <div class="d-flex">
+                    <div class="col m-auto">
+                        <div class="stat-box">
+                            <div class="stat-number" id="statSession"></div>
+                            <div class="stat-label">Sesiones</div>
+                        </div>
+                    </div>
+                    <div class="col m-auto">
+                        <div class="stat-box">
+                            <div class="stat-number" id="statHrTotal"></div>
+                            <div class="stat-label">Total Hrs. Profesor</div>
+                        </div>
+                    </div>
+                    <div class="col m-auto">
+                        <div class="stat-box">
+                            <div class="stat-number" id="statDurMedia"></div>
+                            <div class="stat-label">Duración Media Sesión</div>
+                        </div>
+                    </div>
+                    <div class="col m-auto">
+                        <div class="stat-box">
+                            <div class="stat-number" id="statHrTotalTalent"></div>
+                            <div class="stat-label">Total Hrs. Talent</div>
+                        </div>
+                    </div>
+                    <div class="col m-auto">
+                        <div class="stat-box">
+                            <div class="stat-number" id="statAlumnosAtendidos"></div>
+                            <div class="stat-label">Profesores</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Filtros activados -->
         <div class="row my-3 filters-summary">
             <div class="d-flex flex-row row m-auto my-2">
@@ -281,6 +345,8 @@ if ($conn->connect_error) {
                 <div class="col-md-10" id="filterList-categoria"></div>
             </div>
         </div>
+
+        
 
         <!-- Tab headers -->
         <div class="my-3">
@@ -385,6 +451,7 @@ if ($conn->connect_error) {
                 $("#tableBodyCategorias").html("");
                 ResultadoTab();
                 CategoriasTab();
+                SummaryBox();
             });
 
             // Limpiar
@@ -591,6 +658,118 @@ if ($conn->connect_error) {
             });
         }
 
+        function SummaryBox(){
+            filters = getFilters();
+            var filtersQuery = {};
+            console.log(filters);
+            
+            if(filters["sede"].length > 0){
+                filtersQuery["sede"] = " AND asesoria.id_Sede IN ("+filters["sede"]+")";
+            }else{
+                filtersQuery["sede"] = "";
+            }
+            if(filters["fechaInicio"] != ''){
+                filtersQuery["fechaInicio"] = " AND asesoria.Fecha >= '"+filters["fechaInicio"]+"'";
+            }else{
+                filtersQuery["fechaInicio"] = "";
+            }
+            if(filters["fechaFin"] != ''){
+                filtersQuery["fechaFin"] = " AND asesoria.Fecha <= '"+filters["fechaFin"]+"'";
+            }else{
+                filtersQuery["fechaFin"] = "";
+            }
+            if(filters["talent"].length > 0){
+                filtersQuery["talent"] = " AND asesor.ID IN ("+filters["talent"]+")";
+            }else{
+                filtersQuery["talent"] = "";
+            }
+            if(filters["categoria"].length > 0){
+                filtersQuery["categoria"] = " AND categoria.ID IN ("+filters["categoria"]+")";
+            }else{
+                filtersQuery["categoria"] = "";
+            }
+            let query =`
+            WITH UniqueAsesores AS (
+            SELECT 
+                    asesoria.id_Categoria,
+                    asesoria.ID,
+                    SUM(Duracion) AS Unique_Durations,
+                    COUNT(DISTINCT asesor.ID) AS Unique_Count
+                FROM 
+                    asesoria
+                LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
+                LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
+                GROUP BY 
+                    asesoria.ID
+            )
+            SELECT Llave AS "Key", categoria.Nombre, 
+            COUNT(asesoria.id_Categoria) AS Sesiones,
+            COUNT(DISTINCT asesoria.Correo) AS Profesores,
+                TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60, 0)), '%H:%i') AS ProfesorHoras,
+                TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60, 0)), '%H:%i') AS TalentHoras,
+                TIME_FORMAT(
+                    SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), 
+                    '%H:%i'
+                ) AS ProfesoresMedia,
+                TIME_FORMAT(
+                    SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), 
+                    '%H:%i'
+                ) AS TalentMedia
+
+
+            FROM categoria
+            LEFT JOIN asesoria ON categoria.ID = asesoria.id_Categoria`+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
+            LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
+            LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID`+filtersQuery["talent"]+`
+            LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID
+
+            GROUP BY Llave;`
+            console.log(query);
+
+            $.ajax({
+                    url: 'components/buscar.php',
+                    method: 'POST',
+                    data: {
+                        query: query
+                    },
+                    success: function(response) {
+                        //console.log(response);
+                        if (response != "0"){
+                            response = JSON.parse(response);
+                            responseStats = {
+                                Sesiones: 0,
+                                ProfesorHoras: '00:00',
+                                ProfesoresMedia: '00:00',
+                                TalentHoras: '00:00',
+                                Profesores: 0
+                            };
+                            let totalMinutesProfesorHoras = 0;
+                            let totalMinutesProfesoresMedia = 0;
+                            let totalMinutesTalentHoras = 0;
+                            for(let i = 0; i < response.length; i++){
+                                responseStats["Sesiones"] += parseFloat(response[i]["Sesiones"]);
+                                [hours, minutes] = response[i]["ProfesorHoras"].split(':');
+                                totalMinutesProfesorHoras = (hours * 60 + minutes);
+                                [hours, minutes] = response[i]["ProfesoresMedia"].split(':');
+                                totalMinutesProfesoresMedia = (hours * 60 + minutes);
+                                [hours, minutes] = response[i]["TalentHoras"].split(':');
+                                totalMinutesTalentHoras = (hours * 60 + minutes);
+                                responseStats["Profesores"] += parseFloat(response[i]["Profesores"]);
+                            }
+                            responseStats["ProfesorHoras"] = timeConversion(totalMinutesProfesorHoras);
+                            responseStats["ProfesoresMedia"] = timeConversion(totalMinutesProfesoresMedia);
+                            responseStats["TalentHoras"] = timeConversion(totalMinutesTalentHoras);
+                        }
+                        console.log(responseStats);
+                        $('#statSession').html(responseStats["Sesiones"]);
+                        $('#statHrTotal').html(responseStats["ProfesorHoras"]);
+                        $('#statDurMedia').html(responseStats["ProfesoresMedia"]);
+                        $('#statHrTotalTalent').html(responseStats["TalentHoras"]);
+                        $('#statAlumnosAtendidos').html(responseStats["Profesores"]);
+                    }
+            });
+        }
+
         function getFilters(){
             var filters = {};
             filters["sede"] = $('#filterList-sede span').map(function () {return $(this).attr('value')}).get();
@@ -624,8 +803,15 @@ if ($conn->connect_error) {
             });
         }
 
+        function timeConversion(totalMinutes){
+            totalHours = Math.floor(totalMinutes / 60);
+            remainingMinutes = totalMinutes % 60;
+            return `${String(totalHours).padStart(2, '0')}:${String(remainingMinutes).padStart(2, '0')}`;
+        }
+
         ResultadoTab();
         CategoriasTab();
+        SummaryBox();
     </script>
 </body>
 
