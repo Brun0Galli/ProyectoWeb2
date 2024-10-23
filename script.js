@@ -1,49 +1,4 @@
 $(document).ready(function() {
-
-    var filtros = {};
-    var fechas = {};
-
-    // Agregar filtros seleccionados al resumen
-    function actualizarResumen() {
-        var resumen = $("#filtrosSeleccionados");
-
-        resumen.empty(); // Limpiar el resumen visual
-        $.each(filtros, function(clave, valor) {
-            resumen.append('<span class="filtro-tag">' + clave + ': ' + valor + '</span>');
-        });
-    }
-
-    function actualizarFechas() {
-        var resumen = $("#fechasSeleccionadas");
-
-        resumen.empty(); //
-        $.each(fechas, function(clave, valor) {
-            resumen.append('<span class="filtro-tag">' + clave + ': ' + valor + '</span>');
-        });
-    }
-    // Cuando se selecciona un talent, se agrega automáticamente al resumen
-    $('#talent').on('change', function() {
-        var talentText = $('#talent option:selected').text();
-        if (talentText !== "Seleccione un miembro") {
-            filtros["Talent"] = talentText;
-            actualizarResumen();
-        }
-    });
-    $('#fechaInicio').on('change', function() {
-        var fechaInicio = $('#fechaInicio').val();
-        if (fechaInicio) {
-            fechas["Inicio"] = fechaInicio;
-            actualizarFechas();
-        }
-    });
-    $('#fechaFin').on('change', function() {
-        var fechaFin = $('#fechaFin').val();
-        if (fechaFin) {
-            fechas["Fin"] = fechaFin;
-            actualizarFechas();
-        }
-    });
-
     // Inicializar el calendario
     $('#calendarioInicio').on('click', function() {
         $('#fechaInicio').daterangepicker({
@@ -80,50 +35,356 @@ $(document).ready(function() {
     });
 
     // Buscar
+    $('#buscar').on('click', function(e) {
+        e.preventDefault();
+        $("#tableBodyResultados").html("");
+        $("#tableBodyCategorias").html("");
+        ResultadoTab();
+        CategoriasTab();
+        SummaryBox();
+    });
 
     // Limpiar
     $('#limpiarCampos').on('click', function() {
-        $('#filterForm')[0].reset(); // Limpiar los campos del formulario
-        filtros = {};
-        fechas = {}; // Vaciar el objeto de filtros
-        actualizarResumen();
-        actualizarFechas(); // Actualizar el resumen visual
-        $('#resultados').empty();
+        $('#filterForm')[0].reset();
+        $('#filterList-fechaInicio').html("");
+        $('#filterList-fechaInicio').hide();
+        $('#filterList-fechaFin').html("");
+        $('#filterList-fechaFin').hide();
+        $("#filterList-talent").html("");
+        $('#filterContainer-talent').hide();
+        $("#filterList-sede").html("");
+        $('#filterContainer-sede').hide();
+        $("#filterList-categoria").html("");
+        $('#filterContainer-categoria').hide();
     });
+
+    //Filtros
+    //Fecha
+    $('#fechaInicio').on("change keyup paste",function () {
+        if($('#fechaInicio').val() != ""){
+            $('#filterList-fechaInicio').show();
+            let innerValue = '<span class="me-2">DESDE:</span>' + "<span class='me-3'>"+ $('#fechaInicio').val() +"</span>";
+            $('#filterList-fechaInicio').html(innerValue);
+        }else{
+            $('#filterList-fechaInicio').hide();
+        }
+    });
+
+    $('#fechaFin').on("change keyup paste",function () {
+        if($('#fechaFin').val() != ""){
+            $('#filterList-fechaFin').show();
+            let innerValue = '<span class="me-2">HASTA:</span>' + "<span class='me-3'>"+ $('#fechaFin').val() +"</span>";
+            $('#filterList-fechaFin').html(innerValue);
+        }else{
+            $('#filterList-fechaFin').hide();
+        }
+    });
+
+    $('#filterList-fechaInicio').hide();
+    $('#filterList-fechaFin').hide();
+    $("#filterContainer-"+"talent").hide();
+    $("#filterContainer-"+"sede").hide();
+    $("#filterContainer-"+"categoria").hide();
+    listenToFilter("talent");
+    listenToFilter("sede");
+    listenToFilter("categoria");
+
 });
-document.addEventListener("DOMContentLoaded", function() {
-    // Obtener todos los enlaces del menú y todas las secciones
-    const links = document.querySelectorAll(".nav-menu a");
-    const sections = document.querySelectorAll(".section");
-
-    // Función para cambiar de sección
-    function showSection(hash) {
-        // Ocultar todas las secciones
-        sections.forEach(section => {
-            section.classList.remove("active");
-        });
-
-        // Remover clase "active" de todos los enlaces
-        links.forEach(link => {
-            link.classList.remove("active");
-        });
-
-        // Mostrar la sección correcta y resaltar el enlace activo
-        document.querySelector(hash).classList.add("active");
-        document.querySelector(`a[href='${hash}']`).classList.add("active");
+function ResultadoTab(){
+    filters = getFilters();
+    filteryQuery = "";
+    console.log(filters);
+    
+    if(filters["sede"].length > 0){
+        filteryQuery += " AND asesoria.id_Sede IN ("+filters["sede"]+")";
     }
+    if(filters["fechaInicio"] != ''){
+        filteryQuery += " AND asesoria.Fecha >= '"+filters["fechaInicio"]+"'";
+    }
+    if(filters["fechaFin"] != ''){
+        filteryQuery += " AND asesoria.Fecha <= '"+filters["fechaFin"]+"'";
+    }
+    if(filters["talent"].length > 0){
+        filteryQuery += " AND asesor.ID IN ("+filters["talent"]+")";
+    }
+    if(filters["categoria"].length > 0){
+        filteryQuery += " AND categoria.ID IN ("+filters["categoria"]+")";
+    }
+    let query = "SELECT asesoria.ID, asesoria.Correo AS Correo, " +
+    "asesoria.Fecha, asesoria.duracion AS Duracion, " +
+    "categoria.Llave AS Categoria, asesor.nombre AS Asesor " +
+    "FROM asesor " +
+    "INNER JOIN asesoria_asesor ON asesor.ID = asesoria_asesor.id_Asesor " +
+    "INNER JOIN asesoria ON asesoria_asesor.id_Asesoria = asesoria.ID " +
+    "INNER JOIN categoria ON categoria.ID = asesoria.id_Categoria " +
+    "WHERE 1=1" + filteryQuery + " " +
+    "ORDER BY asesoria.Fecha DESC;";
+    console.log(query);
 
-    // Detectar el hash actual en la URL y mostrar la sección correspondiente
-    const currentHash = window.location.hash || "#resultados";
-    showSection(currentHash);
-
-    // Añadir evento click a cada enlace
-    links.forEach(link => {
-        link.addEventListener("click", function(event) {
-            event.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
-            const hash = this.getAttribute("href");
-            window.location.hash = hash; // Cambiar la URL
-            showSection(hash); // Mostrar la sección correspondiente
-        });
+    $.ajax({
+            url: 'components/buscar.php',
+            method: 'POST',
+            data: {
+                query: query
+            },
+            success: function(response) {
+                //console.log(response);
+                if (response != "0"){
+                    response = JSON.parse(response);
+                    for(let i = 0; i < response.length; i++){
+                        //console.log(response[i]);
+                        let element = "<tr>"+
+                        "<td>"+response[i]["ID"]+"</td>"+
+                        "<td>"+response[i]["Correo"]+"</td>"+
+                        "<td>"+response[i]["Fecha"]+"</td>"+
+                        "<td>"+response[i]["Duracion"]+"</td>"+
+                        "<td>"+response[i]["Categoria"]+"</td>"+
+                        "<td>"+response[i]["Asesor"]+"</td>"+
+                        "</tr>";
+                        // console.log(element);
+                        $("#tableBodyResultados").append(element);
+                    }
+                }
+            }
     });
-});
+}
+
+function CategoriasTab(){
+    filters = getFilters();
+    var filtersQuery = {};
+    console.log(filters);
+    
+    if(filters["sede"].length > 0){
+        filtersQuery["sede"] = " AND asesoria.id_Sede IN ("+filters["sede"]+")";
+    }else{
+        filtersQuery["sede"] = "";
+    }
+    if(filters["fechaInicio"] != ''){
+        filtersQuery["fechaInicio"] = " AND asesoria.Fecha >= '"+filters["fechaInicio"]+"'";
+    }else{
+        filtersQuery["fechaInicio"] = "";
+    }
+    if(filters["fechaFin"] != ''){
+        filtersQuery["fechaFin"] = " AND asesoria.Fecha <= '"+filters["fechaFin"]+"'";
+    }else{
+        filtersQuery["fechaFin"] = "";
+    }
+    if(filters["talent"].length > 0){
+        filtersQuery["talent"] = " AND asesoria_asesor.id_Asesor IN ("+filters["talent"]+")";
+    }else{
+        filtersQuery["talent"] = "";
+    }
+    if(filters["categoria"].length > 0){
+        filtersQuery["categoria"] = " AND categoria.ID IN ("+filters["categoria"]+")";
+    }else{
+        filtersQuery["categoria"] = "";
+    }
+    let query =`
+    WITH UniqueAsesores AS (
+    SELECT 
+            asesoria.id_Categoria,
+            asesoria.ID,
+            SUM(Duracion) AS Unique_Durations,
+            COUNT(DISTINCT asesor.ID) AS Unique_Count
+        FROM 
+            asesoria
+        LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
+        LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
+        GROUP BY 
+            asesoria.ID
+    )
+    SELECT Llave AS "Key", categoria.Nombre, 
+    COUNT(asesoria.id_Categoria) AS Sesiones,
+    COUNT(DISTINCT asesoria.Correo) AS Profesores,
+        TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60, 0)), '%H:%i') AS ProfesorHoras,
+        TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60, 0)), '%H:%i') AS TalentHoras,
+        TIME_FORMAT(
+            SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), 
+            '%H:%i'
+        ) AS ProfesoresMedia,
+        TIME_FORMAT(
+            SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), 
+            '%H:%i'
+        ) AS TalentMedia
+
+
+    FROM categoria
+    INNER JOIN asesoria ON categoria.ID = asesoria.id_Categoria`+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
+    INNER JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria`+filtersQuery["talent"]+`
+    LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
+    LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID
+
+    GROUP BY Llave;`
+    console.log(query);
+
+    $.ajax({
+            url: 'components/buscar.php',
+            method: 'POST',
+            data: {
+                query: query
+            },
+            success: function(response) {
+                //console.log(response);
+                if (response != "0"){
+                    response = JSON.parse(response);
+                    for(let i = 0; i < response.length; i++){
+                        //console.log(response[i]);
+                        let element = "<tr>"+
+                        "<td>"+response[i]["Key"]+"</td>"+
+                        "<td>"+response[i]["Nombre"]+"</td>"+
+                        "<td>"+response[i]["Sesiones"]+"</td>"+
+                        "<td>"+response[i]["Profesores"]+"</td>"+
+                        "<td>"+response[i]["ProfesorHoras"]+"</td>"+
+                        "<td>"+response[i]["TalentHoras"]+"</td>"+
+                        "<td>"+response[i]["ProfesoresMedia"]+"</td>"+
+                        "<td>"+response[i]["TalentMedia"]+"</td>"+
+                        "</tr>";
+                        // console.log(element);
+                        $("#tableBodyCategorias").append(element);
+                    }
+                }
+            }
+    });
+}
+
+function SummaryBox(){
+    filters = getFilters();
+    var filtersQuery = {};
+    console.log(filters);
+    
+    if(filters["sede"].length > 0){
+        filtersQuery["sede"] = " AND asesoria.id_Sede IN ("+filters["sede"]+")";
+    }else{
+        filtersQuery["sede"] = "";
+    }
+    if(filters["fechaInicio"] != ''){
+        filtersQuery["fechaInicio"] = " AND asesoria.Fecha >= '"+filters["fechaInicio"]+"'";
+    }else{
+        filtersQuery["fechaInicio"] = "";
+    }
+    if(filters["fechaFin"] != ''){
+        filtersQuery["fechaFin"] = " AND asesoria.Fecha <= '"+filters["fechaFin"]+"'";
+    }else{
+        filtersQuery["fechaFin"] = "";
+    }
+    if(filters["talent"].length > 0){
+        filtersQuery["talent"] = " AND asesoria_asesor.id_Asesor IN ("+filters["talent"]+")";
+    }else{
+        filtersQuery["talent"] = "";
+    }
+    if(filters["categoria"].length > 0){
+        filtersQuery["categoria"] = " AND categoria.ID IN ("+filters["categoria"]+")";
+    }else{
+        filtersQuery["categoria"] = "";
+    }
+    let query =`
+    WITH UniqueAsesores AS (
+    SELECT 
+            asesoria.id_Categoria,
+            asesoria.ID,
+            SUM(Duracion) AS Unique_Durations,
+            COUNT(DISTINCT asesor.ID) AS Unique_Count
+        FROM 
+            asesoria
+        LEFT JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
+        LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
+        GROUP BY 
+            asesoria.ID
+    )
+    SELECT Llave AS "Key", categoria.Nombre, 
+    COUNT(asesoria.id_Categoria) AS Sesiones,
+    COUNT(DISTINCT asesoria.Correo) AS Profesores,
+        TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60, 0)), '%H:%i') AS ProfesorHoras,
+        TIME_FORMAT(SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60, 0)), '%H:%i') AS TalentHoras,
+        TIME_FORMAT(
+            SEC_TO_TIME(IFNULL(SUM(asesoria.Duracion) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), 
+            '%H:%i'
+        ) AS ProfesoresMedia,
+        TIME_FORMAT(
+            SEC_TO_TIME(IFNULL(SUM(UniqueAsesores.Unique_Durations) * 60 / NULLIF(COUNT(asesoria.id_Categoria), 0), 0)), 
+            '%H:%i'
+        ) AS TalentMedia
+
+
+    FROM categoria
+    INNER JOIN asesoria ON categoria.ID = asesoria.id_Categoria`+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
+    INNER JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria`+filtersQuery["talent"]+`
+    LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
+    LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID;`
+    console.log(query);
+
+    $.ajax({
+            url: 'components/buscar.php',
+            method: 'POST',
+            data: {
+                query: query
+            },
+            success: function(response) {
+                //console.log(response);
+                if (response != "0"){
+                    response = JSON.parse(response);
+                    responseStats = {
+                        Sesiones: 0,
+                        ProfesorHoras: '00:00',
+                        ProfesoresMedia: '00:00',
+                        TalentHoras: '00:00',
+                        Profesores: 0
+                    };
+                    let totalMinutesProfesorHoras = 0;
+                    let totalMinutesProfesoresMedia = 0;
+                    let totalMinutesTalentHoras = 0;
+                    for(let i = 0; i < response.length; i++){
+                        responseStats["Sesiones"] = parseFloat(response[i]["Sesiones"]);
+                        responseStats["ProfesorHoras"] = response[i]["ProfesorHoras"];
+                        responseStats["ProfesoresMedia"] = response[i]["ProfesoresMedia"];
+                        responseStats["TalentHoras"] = response[i]["TalentHoras"];
+                        responseStats["Profesores"] = parseFloat(response[i]["Profesores"]);
+                    }
+                }
+                console.log(responseStats);
+                $('#statSession').html(responseStats["Sesiones"]);
+                $('#statHrTotal').html(responseStats["ProfesorHoras"]);
+                $('#statDurMedia').html(responseStats["ProfesoresMedia"]);
+                $('#statHrTotalTalent').html(responseStats["TalentHoras"]);
+                $('#statAlumnosAtendidos').html(responseStats["Profesores"]);
+            }
+    });
+}
+
+function getFilters(){
+    var filters = {};
+    filters["sede"] = $('#filterList-sede span').map(function () {return $(this).attr('value')}).get();
+    filters["talent"] = $('#filterList-talent span').map(function () {return $(this).attr('value')}).get();
+    filters["categoria"] = $('#filterList-categoria span').map(function () {return $(this).attr('value')}).get();
+    filters["fechaInicio"] = $('#fechaInicio').val();
+    filters["fechaFin"] = $('#fechaFin').val();
+
+    console.log(filters);
+    return filters;
+}
+
+function deleteSelfFilter(button){
+    if($(button).parent().children().length <= 1){
+        $(button).parent().parent().hide();
+    }
+    $(button).remove();
+}
+
+function listenToFilter(category){
+    $('#'+category).on("change keyup paste",function () {
+            $("#filterContainer-"+category).show();
+
+            let element = '<button class="btn-filter me-3" onclick="deleteSelfFilter(this)"><span value="'+
+            $('#'+category).val()+'">'+
+            $('#'+category+' option:selected').text()+
+            '</span><i class="bi bi-trash ms-3"></i></button>';
+
+            $('#filterList-'+category).append(element);
+            $('#'+category).val("0"); 
+    });
+}
+
+ResultadoTab();
+CategoriasTab();
+SummaryBox();
