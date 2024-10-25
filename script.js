@@ -283,11 +283,12 @@ function AsesoresTab(){
     let query =`
     WITH UniqueAsesores AS (
         SELECT 
+            asesoria.ID AS id_Asesoria,
             asesor.ID AS id_Asesor,
             asesor.Correo AS Correo,
             asesor.Nombre AS Nombre,
             SUM(asesoria.Duracion) AS TotalDurationPerAdvisor,
-            COUNT(DISTINCT asesoria.ID) AS TotalSessions
+            COUNT(asesoria.id_Categoria) AS Sesiones
         FROM 
             asesor
         LEFT JOIN asesoria_asesor ON asesor.ID = asesoria_asesor.id_Asesor
@@ -304,7 +305,7 @@ function AsesoresTab(){
     SELECT 
         UniqueAsesores.Correo,
         UniqueAsesores.Nombre,
-        UniqueAsesores.TotalSessions AS Sesiones,
+        UniqueAsesores.Sesiones AS Sesiones,
 
         TIME_FORMAT(
             SEC_TO_TIME(IFNULL(UniqueAsesores.TotalDurationPerAdvisor * 60, 0)), '%H:%i'
@@ -312,7 +313,7 @@ function AsesoresTab(){
 
         TIME_FORMAT(
             SEC_TO_TIME(
-                IFNULL(UniqueAsesores.TotalDurationPerAdvisor * 60 / NULLIF(UniqueAsesores.TotalSessions, 0), 0)
+                IFNULL(UniqueAsesores.TotalDurationPerAdvisor * 60 / NULLIF(UniqueAsesores.Sesiones, 0), 0)
             ), '%H:%i'
         ) AS DuracionMediaSesion,
 
@@ -324,11 +325,11 @@ function AsesoresTab(){
             (UniqueAsesores.TotalDurationPerAdvisor / (SELECT TotalDuration FROM TotalDurations)) * 100, 2
         ) AS PorcentajeTiempoTalent
 
-    FROM UniqueAsesores
+    FROM UniqueAsesores, asesoria
 
     WHERE
-    1=1 `+filtersQuery["talent"]+`;
-    `
+    asesoria.ID = UniqueAsesores.id_Asesoria AND
+     1=1 `+filtersQuery["talent"]+filtersQuery["sede"]+`;`
     console.log(query);
 
     $.ajax({
