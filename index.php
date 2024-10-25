@@ -209,7 +209,7 @@ if ($conn->connect_error) {
         <!-- Tab content -->
         <div class="tab-content my-2" id="myTabContent">
             <div class="tab-pane show active" id="resultados" role="tabpanel">
-                <table class="table table-striped table-dark" id="table">
+                <table class="table table-hover table-dark table-custom" id="table">
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
@@ -225,7 +225,7 @@ if ($conn->connect_error) {
                 </table>
             </div>
             <div class="tab-pane" id="categorias" role="tabpanel">
-                <table class="table table-striped table-dark" id="table">
+                <table class="table table-hover table-dark table-custom" id="table">
                     <thead>
                         <tr>
                             <th scope="col">Key</th>
@@ -243,7 +243,7 @@ if ($conn->connect_error) {
                 </table>
             </div>
             <div class="tab-pane" id="asesores" role="tabpanel">
-                <table class="table table-striped table-dark" id="table">
+                <table class="table table-hover table-dark table-custom" id="table">
                     <thead>
                         <tr>
                             <th scope="col">Correo</th>
