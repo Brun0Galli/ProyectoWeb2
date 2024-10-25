@@ -298,9 +298,12 @@ function AsesoresTab(){
     TotalDurations AS (
         SELECT 
             SUM(TotalDurationPerAdvisor) AS TotalDuration
-        FROM UniqueAsesores
-        WHERE
-        1=1 `+filtersQuery["talent"]+`
+            FROM UniqueAsesores
+    INNER JOIN asesoria ON asesoria.ID = UniqueAsesores.id_Asesoria`+filtersQuery["talent"]+``+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
+    INNER JOIN categoria ON categoria.ID = asesoria.id_Categoria
+    INNER JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
+    LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
+
     )
     SELECT 
         UniqueAsesores.Correo,
@@ -325,11 +328,13 @@ function AsesoresTab(){
             (UniqueAsesores.TotalDurationPerAdvisor / (SELECT TotalDuration FROM TotalDurations)) * 100, 2
         ) AS PorcentajeTiempoTalent
 
-    FROM UniqueAsesores, asesoria
 
-    WHERE
-    asesoria.ID = UniqueAsesores.id_Asesoria AND
-     1=1 `+filtersQuery["talent"]+filtersQuery["sede"]+`;`
+    FROM UniqueAsesores
+    INNER JOIN asesoria ON asesoria.ID = UniqueAsesores.id_Asesoria`+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+``+filtersQuery["talent"]+`
+    INNER JOIN categoria ON categoria.ID = asesoria.id_Categoria
+    INNER JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
+    LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID;`;
+
     console.log(query);
 
     $.ajax({
