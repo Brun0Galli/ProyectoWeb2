@@ -1,36 +1,88 @@
-
 $(document).ready(function() {
-
-    var filtros = {};
+    var filtros = {
+        Talent: [],
+        Categoria: [],
+        CategoriaID1: []
+    };
     var fechas = {};
-    var categorias = {};
 
-   
+    cargarFiltrosDesdeCache();
+
+    function cargarFiltrosDesdeCache() {
+        filtros.Categoria = JSON.parse(localStorage.getItem('Categoria')) || [];
+        filtros.Talent = JSON.parse(localStorage.getItem('TalentID')) || [];
+        filtros.CategoriaID1 = JSON.parse(localStorage.getItem('CategoriaID1')) || [];
+        actualizarResumen();
+        actualizarFechas();
+    }
+
+    function guardarFiltrosEnCache() {
+        localStorage.setItem('Categoria', JSON.stringify(filtros.Categoria));
+        localStorage.setItem('TalentID', JSON.stringify(filtros.Talent));
+        localStorage.setItem('CategoriaID1', JSON.stringify(filtros.CategoriaID1));
+    }
+
     function actualizarResumen() {
         var resumen = $("#filtrosSeleccionados");
+        resumen.empty();
 
-        resumen.empty(); 
-        $.each(filtros, function(clave, valor) {
-            resumen.append('<span class="filtro-tag">' + clave + ': ' + valor + '</span>');
+        filtros.Talent.forEach(function(talent) {
+            resumen.append('<span class="filtro-tag">' + talent + ' <button class="remove-tag" data-type="Talent" data-value="' + talent + '">x</button></span> ');
+        });
+
+        filtros.Categoria.forEach(function(categoria) {
+            resumen.append('<span class="filtro-tag">' + categoria + ' <button class="remove-tag" data-type="Categoria" data-value="' + categoria + '">x</button></span> ');
         });
     }
 
+    $('#filtrosSeleccionados').on('click', '.remove-tag', function() {
+        var type = $(this).data('type');
+        var value = $(this).data('value');
+
+        if (type === 'Categoria') {
+            var index = filtros['Categoria'].indexOf(value);
+            if (index > -1) {
+                filtros['Categoria'].splice(index, 1);
+                filtros['CategoriaID1'].splice(index, 1);
+            }
+        } else {
+            filtros[type] = filtros[type].filter(function(item) {
+                return item !== value;
+            });
+        }
+
+        actualizarResumen();
+        guardarFiltrosEnCache();
+    });
+
     function actualizarFechas() {
         var resumen = $("#fechasSeleccionadas");
-
-        resumen.empty(); //
+        resumen.empty();
         $.each(fechas, function(clave, valor) {
             resumen.append('<span class="filtro-tag">' + clave + ': ' + valor + '</span>');
         });
     }
-    // Cuando se selecciona un talent, se agrega automáticamente al resumen
+
     $('#talent').on('change', function() {
         var talentText = $('#talent option:selected').text();
-        if (talentText !== "Seleccione un miembro") {
-            filtros["Talent"] = talentText;
+        if (talentText !== "Seleccione un miembro" && !filtros.Talent.includes(talentText)) {
+            filtros.Talent.push(talentText);
             actualizarResumen();
+            guardarFiltrosEnCache();
         }
     });
+
+    $('#categoria').on('change', function() {
+        var categoriaText = $('#categoria option:selected').text();
+        var categoriaID = $('#categoria option:selected').val();
+        if (categoriaText !== "Seleccione una Categoría" && !filtros.Categoria.includes(categoriaText)) {
+            filtros.Categoria.push(categoriaText);
+            filtros.CategoriaID1.push(categoriaID);
+            actualizarResumen();
+            guardarFiltrosEnCache();
+        }
+    });
+
     $('#fechaInicio').on('change', function() {
         var fechaInicio = $('#fechaInicio').val();
         if (fechaInicio) {
@@ -38,6 +90,7 @@ $(document).ready(function() {
             actualizarFechas();
         }
     });
+
     $('#fechaFin').on('change', function() {
         var fechaFin = $('#fechaFin').val();
         if (fechaFin) {
@@ -45,95 +98,92 @@ $(document).ready(function() {
             actualizarFechas();
         }
     });
-    $('#categoria').on('change', function() {
-        var categoriaText = $('#categoria option:selected').text();
-        if (categoriaText !== "Seleccione una Categoría") {
-            filtros["Categoría"] = categoriaText;
-            actualizarResumen();
-        }
-    });
-    
 
-    // Inicializar el calendario
-    $('#calendarioInicio').on('click', function() {
-        $('#fechaInicio').daterangepicker({
-            singleDatePicker: true,
-            timePicker: true,
-            timePicker24Hour: true,
-            showDropdowns: true, 
-            locale: {
-                format: 'YYYY-MM-DD HH:mm',
-                applyLabel: "Aplicar",
-                cancelLabel: "Cancelar",
-                daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
-                monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-                firstDay: 1 
-            }
-        });
-    });
-
-    $('#calendarioFin').on('click', function() {
-        $('#fechaFin').daterangepicker({
-            singleDatePicker: true,
-            timePicker: true,
-            timePicker24Hour: true,
-            showDropdowns: true, 
-            locale: {
-                format: 'YYYY-MM-DD HH:mm',
-                applyLabel: "Aplicar",
-                cancelLabel: "Cancelar",
-                daysOfWeek: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
-                monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-                firstDay: 1
-            }
-        });
-    });
-
-    // Limpiar
     $('#limpiarCampos').on('click', function() {
-        $('#filterForm')[0].reset(); // Limpiar los campos del formulario
-        filtros = {};
-        fechas = {}; // Vaciar el objeto de fechas y filtross
+        filtros = {
+            Talent: [],
+            Categoria: [],
+            CategoriaID1: []
+        };
+        fechas = {};
+        localStorage.removeItem('Categoria');
+        localStorage.removeItem('TalentID');
+        localStorage.removeItem('CategoriaID1');
         actualizarResumen();
         actualizarFechas();
+        $('#filterForm')[0].reset();
         $('#statSession').html('0');
         $('#statHrTotal').html('00:00');
         $('#statDurMedia').html('00:00');
         $('#statHrTotalTalent').html('00:00 ');
         $('#statAlumnosAtendidos').html('0');
-
     });
 
     function convertMinutesToHHMM(minutes) {
-        var hours = Math.floor(minutes / 60); 
-        var mins = Math.floor(minutes % 60); 
-        return hours + ':' + (mins < 10 ? '0' : '') + mins; 
+        var hours = Math.floor(minutes / 60);
+        var mins = Math.floor(minutes % 60);
+        return hours + ':' + (mins < 10 ? '0' : '') + mins;
     }
-    $('#buscar').on('click', function(e) {
-        e.preventDefault(); 
+    function cargarAsesores() {
+        var talentID = JSON.parse(localStorage.getItem('TalentID')) || []; // Obtener TalentID desde localStorage
+    
+        $.ajax({
+            url: 'asesores.php', // Archivo PHP que ejecutará el query
+            type: 'POST',
+            dataType: 'html', // Esperamos un HTML de respuesta para mostrar en la tabla
+            data: {
+                talent_id: JSON.stringify(talentID) // Enviar TalentID como JSON
+            },
+            success: function(response) {
+                $('#asesores tbody').html(response); // Insertar la respuesta en la tabla
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Error en la solicitud AJAX: " + textStatus + " " + errorThrown);
+            }
+        });
+    }
+    function cargarCategorias() {
+        var categoriaID1 = JSON.parse(localStorage.getItem('CategoriaID1')) || [];
+        $.ajax({
+            url: 'categorias.php',
+            type: 'POST',
+            dataType: 'html',
+            data:{
+                categoria_id: JSON.stringify(categoriaID1)
+            },
+            success: function(response) {
+                $('#categorias tbody').html(response);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Error en la solicitud AJAX: " + textStatus + " " + errorThrown);
+            }
+        });
+    }
 
-        var talentID = $('#talent').val();
+    $('#buscar').on('click', function(e) {
+        e.preventDefault();
+
+        var talentID = filtros.Talent;
         var fechaInicio = $('#fechaInicio').val();
         var fechaFin = $('#fechaFin').val();
-        var categoria = $('#categoria').val();
-        console.log(categoria)
-        if (talentID !== "0") { 
+        var categoria = filtros.CategoriaID1;
+
+        if (talentID.length > 0) { 
+            cargarCategorias();
+            cargarAsesores();
+            
             $.ajax({
-                url: 'actualizar_estadisticas.php', // Archivo PHP que ejecutará los queries
+                url: 'actualizar_estadisticas.php',
                 type: 'POST',
-                dataType: 'json', 
+                dataType: 'json',
                 data: {
-                    talent_id: talentID,
+                    talent_id: JSON.stringify(talentID),
                     fecha_inicio: fechaInicio,
                     fecha_fin: fechaFin,
-                    categoria_id: categoria
-
+                    categoria_id: JSON.stringify(categoria)
                 },
                 success: function(response) {
-                    
                     actualizarResultadosTira(response.estadisticas);
-                    console.log(response)
-                    
                     let html = '';
                     response.asesorias.forEach(function(asesoria) {
                         html += '<tr>';
@@ -146,6 +196,7 @@ $(document).ready(function() {
                         html += '</tr>';
                     });
                     $('#resultados tbody').html(html);
+                    
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.log("Error: " + textStatus + " " + errorThrown);
@@ -154,49 +205,48 @@ $(document).ready(function() {
         } else {
             alert("Por favor, selecciona un Talent válido.");
         }
+
     });
 
     function actualizarResultadosTira(data) {
         $('#statSession').text(data.cantidad_sesiones);
-        $('#statHrTotal').text(convertMinutesToHHMM(data.total_horas_alumnos)); 
-        $('#statDurMedia').text(convertMinutesToHHMM(data.duracion_media_sesion)); 
-        $('#statHrTotalTalent').text(convertMinutesToHHMM(data.total_horas_talent)); 
-        $('#statAlumnosAtendidos').text(data.cantidad_alumnos_unicos); 
+        $('#statHrTotal').text(convertMinutesToHHMM(data.total_horas_alumnos));
+        $('#statDurMedia').text(convertMinutesToHHMM(data.duracion_media_sesion));
+        $('#statHrTotalTalent').text(convertMinutesToHHMM(data.total_horas_talent));
+        $('#statAlumnosAtendidos').text(data.cantidad_alumnos_unicos);
     }
 });
+
+// Lógica de navegación entre pestañas
 document.addEventListener("DOMContentLoaded", function() {
-    // Obtener todos los enlaces del menú y todas las secciones
     const links = document.querySelectorAll(".nav-menu a");
     const sections = document.querySelectorAll(".section");
 
-    // Función para cambiar de sección
     function showSection(hash) {
-   
-        sections.forEach(section => {
-            section.classList.remove("active");
-        });
+        sections.forEach(section => section.classList.remove("active"));
+        links.forEach(link => link.classList.remove("active"));
 
-        
-        links.forEach(link => {
-            link.classList.remove("active");
-        });
+        const targetSection = document.querySelector(hash);
+        const targetLink = document.querySelector(`a[href='${hash}']`);
 
-        
-        document.querySelector(hash).classList.add("active");
-        document.querySelector(`a[href='${hash}']`).classList.add("active");
+        if (targetSection) targetSection.classList.add("active");
+        if (targetLink) targetLink.classList.add("active");
     }
 
-    // Detectar el hash actual en la URL y mostrar la sección correspondiente
     const currentHash = window.location.hash || "#resultados";
     showSection(currentHash);
 
-    
     links.forEach(link => {
         link.addEventListener("click", function(event) {
-            event.preventDefault(); 
+            event.preventDefault();
             const hash = this.getAttribute("href");
-            window.location.hash = hash; 
-            showSection(hash); 
+
+            window.history.pushState(null, null, hash);
+            showSection(hash);
         });
+    });
+
+    window.addEventListener("popstate", function() {
+        showSection(window.location.hash || "#resultados");
     });
 });
