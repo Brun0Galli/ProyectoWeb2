@@ -39,8 +39,10 @@ $(document).ready(function() {
         e.preventDefault();
         $("#tableBodyResultados").html("");
         $("#tableBodyCategorias").html("");
+        $("#tableBodyAsesores").html("");
         ResultadoTab();
         CategoriasTab();
+        AsesoresTab();
         SummaryBox();
     });
 
@@ -120,7 +122,7 @@ function ResultadoTab(){
     "INNER JOIN categoria ON categoria.ID = asesoria.id_Categoria " +
     "WHERE 1=1" + filteryQuery + " " +
     "ORDER BY asesoria.Fecha DESC;";
-    console.log(query);
+    //console.log(query);
 
     $.ajax({
             url: 'components/buscar.php',
@@ -216,7 +218,7 @@ function CategoriasTab(){
     LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID
 
     GROUP BY Llave;`
-    console.log(query);
+    //console.log(query);
 
     $.ajax({
             url: 'components/buscar.php',
@@ -242,6 +244,111 @@ function CategoriasTab(){
                         "</tr>";
                         // console.log(element);
                         $("#tableBodyCategorias").append(element);
+                    }
+                }
+            }
+    });
+}
+
+function AsesoresTab(){
+    filters = getFilters();
+    var filtersQuery = {};
+    console.log(filters);
+    
+    if(filters["sede"].length > 0){
+        filtersQuery["sede"] = " AND asesoria.id_Sede IN ("+filters["sede"]+")";
+    }else{
+        filtersQuery["sede"] = "";
+    }
+    if(filters["fechaInicio"] != ''){
+        filtersQuery["fechaInicio"] = " AND asesoria.Fecha >= '"+filters["fechaInicio"]+"'";
+    }else{
+        filtersQuery["fechaInicio"] = "";
+    }
+    if(filters["fechaFin"] != ''){
+        filtersQuery["fechaFin"] = " AND asesoria.Fecha <= '"+filters["fechaFin"]+"'";
+    }else{
+        filtersQuery["fechaFin"] = "";
+    }
+    if(filters["talent"].length > 0){
+        filtersQuery["talent"] = " AND UniqueAsesores.id_Asesor IN ("+filters["talent"]+")";
+    }else{
+        filtersQuery["talent"] = "";
+    }
+    if(filters["categoria"].length > 0){
+        filtersQuery["categoria"] = " AND categoria.ID IN ("+filters["categoria"]+")";
+    }else{
+        filtersQuery["categoria"] = "";
+    }
+    let query =`
+    WITH UniqueAsesores AS (
+        SELECT 
+            asesor.ID AS id_Asesor,
+            asesor.Correo AS Correo,
+            asesor.Nombre AS Nombre,
+            SUM(asesoria.Duracion) AS TotalDurationPerAdvisor,
+            COUNT(DISTINCT asesoria.ID) AS TotalSessions
+        FROM 
+            asesor
+        LEFT JOIN asesoria_asesor ON asesor.ID = asesoria_asesor.id_Asesor
+        LEFT JOIN asesoria ON asesoria_asesor.id_Asesoria = asesoria.ID
+        GROUP BY asesor.ID
+    ),
+    TotalDurations AS (
+        SELECT 
+            SUM(TotalDurationPerAdvisor) AS TotalDuration
+        FROM UniqueAsesores
+        WHERE
+        1=1 `+filtersQuery["talent"]+`
+    )
+    SELECT 
+        UniqueAsesores.Correo,
+        UniqueAsesores.Nombre,
+        UniqueAsesores.TotalSessions AS Sesiones,
+
+        TIME_FORMAT(
+            SEC_TO_TIME(IFNULL(UniqueAsesores.TotalDurationPerAdvisor * 60, 0)), '%H:%i'
+        ) AS TalentHoras,
+
+        TIME_FORMAT(
+            SEC_TO_TIME(
+                IFNULL(UniqueAsesores.TotalDurationPerAdvisor * 60 / NULLIF(UniqueAsesores.TotalSessions, 0), 0)
+            ), '%H:%i'
+        ) AS DuracionMediaSesion,
+
+        ROUND(
+            (UniqueAsesores.TotalDurationPerAdvisor / (SELECT TotalDuration FROM TotalDurations)) * 100, 2
+        ) AS PorcentajeTiempo
+
+    FROM UniqueAsesores
+
+    WHERE
+    1=1 `+filtersQuery["talent"]+`;
+    `
+    console.log(query);
+
+    $.ajax({
+            url: 'components/buscar.php',
+            method: 'POST',
+            data: {
+                query: query
+            },
+            success: function(response) {
+                //console.log(response);
+                if (response != "0"){
+                    response = JSON.parse(response);
+                    for(let i = 0; i < response.length; i++){
+                        //console.log(response[i]);
+                        let element = "<tr>"+
+                        "<td>"+response[i]["Correo"]+"</td>"+
+                        "<td>"+response[i]["Nombre"]+"</td>"+
+                        "<td>"+response[i]["Sesiones"]+"</td>"+
+                        "<td>"+response[i]["TalentHoras"]+"</td>"+
+                        "<td>"+response[i]["DuracionMediaSesion"]+"</td>"+
+                        "<td>"+response[i]["PorcentajeTiempo"]+"%</td>"+
+                        "</tr>";
+                        // console.log(element);
+                        $("#tableBodyAsesores").append(element);
                     }
                 }
             }
@@ -312,7 +419,7 @@ function SummaryBox(){
     INNER JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria`+filtersQuery["talent"]+`
     LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
     LEFT JOIN UniqueAsesores ON asesoria.ID = UniqueAsesores.ID;`
-    console.log(query);
+    //console.log(query);
 
     $.ajax({
             url: 'components/buscar.php',
@@ -387,4 +494,5 @@ function listenToFilter(category){
 
 ResultadoTab();
 CategoriasTab();
+AsesoresTab();
 SummaryBox();
