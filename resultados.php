@@ -3,8 +3,8 @@ include "components/sql.php";
 
 function convertirMinutos($minutos)
 {
-    $horas = floor($minutos / 60);  // Horas completas
-    $minutosRestantes = $minutos % 60;  // Minutos restantes
+    $horas = floor((float) $minutos / 60);  // Horas completas
+    $minutosRestantes = (int) $minutos % 60;  // Minutos restantes
     return sprintf("%02d:%02d", $horas, $minutosRestantes);  // Formato hh:mm
 }
 $results_per_page = 50;
