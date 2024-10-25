@@ -252,6 +252,7 @@ if ($conn->connect_error) {
                             <th scope="col">Total Horas TALENT</th>
                             <th scope="col">Duracion Media Sesion</th>
                             <th scope="col">% Horas Prof</th>
+                            <th scope="col">% Horas TALENT</th>
                         </tr>
                     </thead>
                     <tbody id="tableBodyAsesores">

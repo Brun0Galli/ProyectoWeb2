@@ -318,7 +318,11 @@ function AsesoresTab(){
 
         ROUND(
             (UniqueAsesores.TotalDurationPerAdvisor / (SELECT TotalDuration FROM TotalDurations)) * 100, 2
-        ) AS PorcentajeTiempo
+        ) AS PorcentajeTiempo,
+
+        ROUND(
+            (UniqueAsesores.TotalDurationPerAdvisor / (SELECT TotalDuration FROM TotalDurations)) * 100, 2
+        ) AS PorcentajeTiempoTalent
 
     FROM UniqueAsesores
 
@@ -346,6 +350,7 @@ function AsesoresTab(){
                         "<td>"+response[i]["TalentHoras"]+"</td>"+
                         "<td>"+response[i]["DuracionMediaSesion"]+"</td>"+
                         "<td>"+response[i]["PorcentajeTiempo"]+"%</td>"+
+                        "<td>"+response[i]["PorcentajeTiempoTalent"]+"%</td>"+
                         "</tr>";
                         // console.log(element);
                         $("#tableBodyAsesores").append(element);
