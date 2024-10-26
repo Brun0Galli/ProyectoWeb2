@@ -299,10 +299,9 @@ function AsesoresTab(){
         SELECT 
             SUM(TotalDurationPerAdvisor) AS TotalDuration
             FROM UniqueAsesores
-    INNER JOIN asesoria ON asesoria.ID = UniqueAsesores.id_Asesoria`+filtersQuery["talent"]+``+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
+    INNER JOIN asesoria ON asesoria.ID = UniqueAsesores.id_Asesoria`+filtersQuery["talent"]+``+filtersQuery["sede"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
     INNER JOIN categoria ON categoria.ID = asesoria.id_Categoria
     INNER JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
-    LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID
 
     )
     SELECT 
@@ -330,10 +329,8 @@ function AsesoresTab(){
 
 
     FROM UniqueAsesores
-    INNER JOIN asesoria ON asesoria.ID = UniqueAsesores.id_Asesoria`+filtersQuery["sede"]+``+filtersQuery["categoria"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+``+filtersQuery["talent"]+`
-    INNER JOIN categoria ON categoria.ID = asesoria.id_Categoria
-    INNER JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
-    LEFT JOIN asesor ON asesoria_asesor.id_Asesor = asesoria.ID;`;
+    INNER JOIN asesoria ON asesoria.ID = UniqueAsesores.id_Asesoria`+filtersQuery["sede"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+``+filtersQuery["talent"]+`
+;`
 
     console.log(query);
 
