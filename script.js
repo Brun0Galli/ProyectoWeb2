@@ -272,8 +272,10 @@ function AsesoresTab(){
     }
     if(filters["talent"].length > 0){
         filtersQuery["talent"] = " AND UniqueAsesores.id_Asesor IN ("+filters["talent"]+")";
+        filtersQuery["talentUnique"] = " AND asesor.ID IN ("+filters["talent"]+")";
     }else{
         filtersQuery["talent"] = "";
+        filtersQuery["talentUnique"] = "";
     }
     if(filters["categoria"].length > 0){
         filtersQuery["categoria"] = " AND categoria.ID IN ("+filters["categoria"]+")";
@@ -291,8 +293,8 @@ function AsesoresTab(){
             COUNT(asesoria.id_Categoria) AS Sesiones
         FROM 
             asesor
-        LEFT JOIN asesoria_asesor ON asesor.ID = asesoria_asesor.id_Asesor
-        LEFT JOIN asesoria ON asesoria_asesor.id_Asesoria = asesoria.ID
+        LEFT JOIN asesoria_asesor ON asesoria_asesor.id_Asesor = asesor.ID
+        INNER JOIN asesoria ON asesoria_asesor.id_Asesoria = asesoria.ID`+filtersQuery["talentUnique"]+``+filtersQuery["sede"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
         GROUP BY asesor.ID
     ),
     TotalDurations AS (
@@ -300,8 +302,6 @@ function AsesoresTab(){
             SUM(TotalDurationPerAdvisor) AS TotalDuration
             FROM UniqueAsesores
     INNER JOIN asesoria ON asesoria.ID = UniqueAsesores.id_Asesoria`+filtersQuery["talent"]+``+filtersQuery["sede"]+``+filtersQuery["fechaInicio"]+``+filtersQuery["fechaFin"]+`
-    INNER JOIN categoria ON categoria.ID = asesoria.id_Categoria
-    INNER JOIN asesoria_asesor ON asesoria.ID = asesoria_asesor.id_Asesoria
 
     )
     SELECT 
